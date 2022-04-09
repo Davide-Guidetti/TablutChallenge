@@ -46,7 +46,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	@Override
 	public State getResult(State stateInital, Action a) {
-		State state=stateInital;//stateInital.clone();
+		State state=stateInital.clone();
 		State.Pawn pawn = state.getPawn(a.getRowFrom(), a.getColumnFrom());
 		State.Pawn[][] newBoard = state.getBoard();
 		// State newState = new State();
@@ -137,12 +137,16 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		List<Action> resultChecked = new ArrayList<>(result.size());
 
 		for (Action action : result) {
-			if(this.checkAction(stato, action))
+			if(this.checkAction(stato, action)) {
+				//System.out.println("STATO CORRENTE\n"+stato.boardString());
 				resultChecked.add(action);
+			}
+				
 		}
 		if(resultChecked.size() <= 0) {
 			DEBUG = true;
 			for (Action action : result) this.checkAction(stato, action);
+			
 			throw new IllegalArgumentException("no moves");
 		}
 		

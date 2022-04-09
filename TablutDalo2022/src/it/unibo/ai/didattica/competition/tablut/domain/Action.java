@@ -29,7 +29,7 @@ public class Action implements Serializable {
 		}
 	}
 
-	public Action(int fromColu, int fromRow, int toCol, int toRow, StateTablut.Turn t) throws IOException {
+	public Action(int fromRow, int fromColu, int toRow, int toCol, StateTablut.Turn t) throws IOException {
 		this.from = (char) (fromColu + 97) + String.valueOf(fromRow + 1);
 		this.to = (char) (toCol + 97) + String.valueOf(toRow + 1);
 		this.turn = t;

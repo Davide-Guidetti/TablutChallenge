@@ -90,7 +90,7 @@ public class TablutDalo extends TablutClient {
 				System.out.println("Error reading the state: " + e1.getMessage());
 				System.exit(1);
 			}
-
+			
 			state = this.getCurrentState();
 			// check if the game is finish
 
