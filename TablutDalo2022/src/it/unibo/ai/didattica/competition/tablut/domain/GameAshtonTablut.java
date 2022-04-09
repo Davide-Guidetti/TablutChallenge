@@ -40,7 +40,7 @@ public class GameAshtonTablut implements Game {
 	private File gameLog;
 	private FileHandler fh;
 	private Logger loggGame;
-	private List<String> citadels;
+	protected List<String> citadels;
 	// private List<String> strangeCitadels;
 	private List<State> drawConditions;
 
