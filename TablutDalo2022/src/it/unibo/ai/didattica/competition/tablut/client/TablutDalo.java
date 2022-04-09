@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidParameterException;
 
+import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut;
 import aima.core.search.adversarial.Game;
 import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
@@ -14,13 +15,13 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 public class TablutDalo extends TablutClient {
 	public static final String NAME = "Cliente";
 	public static final int DEPTH = 4;
-	private IterativeDeepeningAlphaBetaSearch<State, Action, String> searchStrategy;
+	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 
 	public TablutDalo(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
 		Game rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
-		searchStrategy = new IterativeDeepeningAlphaBetaSearch<State, Action, String>(rules, 0.0, 1.0, timeout - 1);
+		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0.0, 1.0, timeout - 1);
 
 	}
 
