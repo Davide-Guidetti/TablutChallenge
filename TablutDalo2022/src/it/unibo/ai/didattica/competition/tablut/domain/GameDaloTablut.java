@@ -75,6 +75,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	@Override
 	public double getUtility(State stato, String player) {
 
+		System.out.println("state: " + stato.boardString());
+		
 		// check terminal state
 		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("white")) {
 			return 1.0;
@@ -95,20 +97,29 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		double value = 0;
 		int contWhiteSoldier = 0;
 		int contBlackSoldier = 0;
+		Pawn[][] b = stato.getBoard();
+		boolean found = false;
 
 		for (int i = 0; i < stato.getBoard().length; i++) {
 			for (int j = 0; j < stato.getBoard().length; j++) {
 				// conto i pedoni bianchi
-				if (stato.getBox(i, j).equals(Pawn.WHITE.toString())) {
+				if (b[i][j].equals(Pawn.WHITE)) {
 					contWhiteSoldier++;
 				}
 				// conto i pedoni neri
-				if (stato.getBox(i, j).equals(Pawn.BLACK.toString())) {
+				if (b[i][j].equals(Pawn.BLACK)) {
 					contBlackSoldier++;
 				}
 				// CASO A
 				// calcolo distanza re da piastrelle di salvezza
-				if (stato.getBox(i, j).equals(Pawn.KING.toString())) {
+				if (b[i][j].equals(Pawn.KING)) {
+					found = true;
+					if((i==0 && (j==2 || j==3 || j==6 || j==7)) ||
+						(i==8 && (j==2 || j==3 || j==6 || j==7)) ||
+						(j==0 && (i==2 || i==3 || i==6 || i==7)) ||
+						(j==8 && (i==2 || i==3 || i==6 || i==7))) {
+						return this.getPlayer(stato).equalsIgnoreCase("white") ? 1.0 : 0.0;
+					}
 					if ((i >= 3 && i <= 5) || (j >= 3 && j <= 5)) {
 						value += 0.0;
 					} else {
@@ -118,62 +129,62 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					// re nel castello
 					int soldierBlack = 0;
 					if (i == 4 && j == 4) {
-						if (stato.getBox(3, 4).equals(Pawn.BLACK.toString())) {
+						if (b[3][4].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(4, 5).equals(Pawn.BLACK.toString())) {
+						if (b[4][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(4, 3).equals(Pawn.BLACK.toString())) {
+						if (b[4][3].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(4, 5).equals(Pawn.BLACK.toString())) {
+						if (b[4][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
 						value += (4 - soldierBlack) / 4 * 0.25;
 					} else
 					// re adiacente al castello
 					if (i == 3 && j == 4) {
-						if (stato.getBox(3, 5).equals(Pawn.BLACK.toString())) {
+						if (b[3][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(3, 3).equals(Pawn.BLACK.toString())) {
+						if (b[3][3].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(2, 4).equals(Pawn.BLACK.toString())) {
+						if (b[2][4].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
 						value += (3 - soldierBlack) / 3 * 0.25;
 					} else if (i == 5 && j == 4) {
-						if (stato.getBox(5, 5).equals(Pawn.BLACK.toString())) {
+						if (b[5][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(5, 3).equals(Pawn.BLACK.toString())) {
+						if (b[5][3].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(6, 4).equals(Pawn.BLACK.toString())) {
+						if (b[6][4].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
 						value += (3 - soldierBlack) / 3 * 0.25;
 					} else if (i == 4 && j == 3) {
-						if (stato.getBox(3, 3).equals(Pawn.BLACK.toString())) {
+						if (b[3][3].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(4, 2).equals(Pawn.BLACK.toString())) {
+						if (b[4][2].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(5, 3).equals(Pawn.BLACK.toString())) {
+						if (b[5][3].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
 						value += (3 - soldierBlack) / 3 * 0.25;
 					} else if (i == 4 && j == 5) {
-						if (stato.getBox(4, 6).equals(Pawn.BLACK.toString())) {
+						if (b[4][6].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(3, 5).equals(Pawn.BLACK.toString())) {
+						if (b[3][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
-						if (stato.getBox(5, 5).equals(Pawn.BLACK.toString())) {
+						if (b[5][5].equals(Pawn.BLACK)) {
 							soldierBlack++;
 						}
 						value += (3 - soldierBlack) / 3 * 0.25;
@@ -185,13 +196,13 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 						value += 0;
 					} else
 					// re con neri vicino
-					if (stato.getBox(i + 1, j).equals(Pawn.BLACK.toString())) {
+					if (stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
 						soldierBlack++;
-					} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK.toString())) {
+					} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
 						soldierBlack++;
-					} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK.toString())) {
+					} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
 						soldierBlack++;
-					} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK.toString())) {
+					} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
 						soldierBlack++;
 					}
 					// tutti gli altri casi
@@ -201,115 +212,119 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				}
 			}
 		}
+		if(found==false) 
+			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : 1.0;
 		// CASO B
 		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * 0.25;
 		// CASO E controllo castello
 		int contCastleWhite = 0;
 		int contCastleBlack = 0;
-		if (stato.getBox(4, 3).equals(Pawn.WHITE.toString())) {
+		if (b[4][3].equals(Pawn.WHITE)) {
 			contCastleWhite++;
 		}
-		if (stato.getBox(4, 5).equals(Pawn.WHITE.toString())) {
+		if (b[4][5].equals(Pawn.WHITE)) {
 			contCastleWhite++;
 		}
-		if (stato.getBox(3, 4).equals(Pawn.WHITE.toString())) {
+		if (b[3][4].equals(Pawn.WHITE)) {
 			contCastleWhite++;
 		}
-		if (stato.getBox(5, 4).equals(Pawn.WHITE.toString())) {
+		if (b[5][4].equals(Pawn.WHITE)) {
 			contCastleWhite++;
 		}
-		if (stato.getBox(4, 3).equals(Pawn.BLACK.toString())) {
+		if (b[4][3].equals(Pawn.BLACK)) {
 			contCastleBlack++;
 		}
-		if (stato.getBox(4, 5).equals(Pawn.BLACK.toString())) {
+		if (b[4][5].equals(Pawn.BLACK)) {
 			contCastleBlack++;
 		}
-		if (stato.getBox(3, 4).equals(Pawn.BLACK.toString())) {
+		if (b[3][4].equals(Pawn.BLACK)) {
 			contCastleBlack++;
 		}
-		if (stato.getBox(5, 4).equals(Pawn.BLACK.toString())) {
+		if (b[5][4].equals(Pawn.BLACK)) {
 			contCastleBlack++;
 		}
 		value += (((contCastleBlack - contCastleWhite * 2) + 8) / 12) * 0.15;
 		// CASO F controllo campi
 		int contCampleWhite = 0;
 		int contCampleBlack = 0;
-		if (stato.getBox(1, 3).equals(Pawn.WHITE.toString())) {
+		if (b[1][3].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(1, 5).equals(Pawn.WHITE.toString())) {
+		if (b[1][5].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(2, 4).equals(Pawn.WHITE.toString())) {
+		if (b[2][4].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(6, 4).equals(Pawn.WHITE.toString())) {
+		if (b[6][4].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(7, 4).equals(Pawn.WHITE.toString())) {
+		if (b[7][4].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(7, 5).equals(Pawn.WHITE.toString())) {
+		if (b[7][5].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(3, 1).equals(Pawn.WHITE.toString())) {
+		if (b[3][1].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(4, 2).equals(Pawn.WHITE.toString())) {
+		if (b[4][2].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(5, 1).equals(Pawn.WHITE.toString())) {
+		if (b[5][1].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(3, 7).equals(Pawn.WHITE.toString())) {
+		if (b[3][7].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(4, 6).equals(Pawn.WHITE.toString())) {
+		if (b[4][6].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(5, 7).equals(Pawn.WHITE.toString())) {
+		if (b[5][7].equals(Pawn.WHITE)) {
 			contCampleWhite++;
 		}
-		if (stato.getBox(1, 3).equals(Pawn.BLACK.toString())) {
+		if (b[1][3].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(1, 5).equals(Pawn.BLACK.toString())) {
+		if (b[1][5].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(2, 4).equals(Pawn.BLACK.toString())) {
+		if (b[2][4].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(6, 4).equals(Pawn.BLACK.toString())) {
+		if (b[6][4].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(7, 4).equals(Pawn.BLACK.toString())) {
+		if (b[7][4].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(7, 5).equals(Pawn.BLACK.toString())) {
+		if (b[7][5].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(3, 1).equals(Pawn.BLACK.toString())) {
+		if (b[3][1].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(4, 2).equals(Pawn.BLACK.toString())) {
+		if (b[4][2].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(5, 1).equals(Pawn.BLACK.toString())) {
+		if (b[5][1].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(3, 7).equals(Pawn.BLACK.toString())) {
+		if (b[3][7].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(4, 6).equals(Pawn.BLACK.toString())) {
+		if (b[4][6].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		if (stato.getBox(5, 7).equals(Pawn.BLACK.toString())) {
+		if (b[5][7].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
 		value += ((contCampleBlack - contCampleWhite * 2) / 32 + 0.5) * 0.15;
 		
 		if (this.getPlayer(stato)=="black") value=1-value;
+		
 		System.out.println("value: "+value);
+		
 		return value;
 	}
 
