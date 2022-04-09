@@ -1,0 +1,258 @@
+apr 09, 2022 11:31:04 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Players:	White	vs	Black
+apr 09, 2022 11:31:04 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Repeated moves allowed:	2	Cache:	2
+apr 09, 2022 11:31:04 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Inizio partita
+apr 09, 2022 11:31:04 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Stato:
+OOOBBBOOO
+OOOOBOOOO
+OOOOWOOOO
+BOOOWOOOB
+BBWWKWWBB
+BOOOWOOOB
+OOOOWOOOO
+OOOOBOOOO
+OOOBBBOOO
+-
+B
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut movePawn
+FINE: Movimento pedina
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Current draw cache size: 1
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Stato:
+OOOBBBOOO
+OOOOBOOOO
+OOOOWOOOO
+BOOOWOOOB
+BBOWKWWBB
+BOWOWOOOB
+OOOOWOOOO
+OOOOBOOOO
+OOOBBBOOO
+-
+B
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c8
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c9
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c2
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from c5 to c1
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d8
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from d5 to d2
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to f3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to g3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to h3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to i3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to d3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to c3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to b3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e3 to a3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to f4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to g4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to h4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to d4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to c4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e4 to b4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to f6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to g6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to h6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to d6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to c6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Mossa sopra una casella occupata
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e6 to b6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to f7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to g7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to h7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to i7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to d7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to c7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to b7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from e7 to a7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f8
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from f5 to f2
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g6
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g7
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g8
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g9
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g4
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g3
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g2
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+FINE: Turn: W Pawn from g5 to g1
+apr 09, 2022 11:31:24 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut checkMove
+WARNING: Giocatore W cerca di muovere una pedina avversaria

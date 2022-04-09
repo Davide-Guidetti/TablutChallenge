@@ -4,26 +4,23 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidParameterException;
 
+import aima.core.search.adversarial.Game;
+import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
-import it.unibo.ai.didattica.competition.tablut.domain.Game;
-import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
-import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
-import search.MinMaxSearch;
-import search.SearchStrategy;
 
 public class TablutDalo extends TablutClient {
 	public static final String NAME = "Cliente";
 	public static final int DEPTH = 4;
-	private SearchStrategy searchStrategy;
+	private IterativeDeepeningAlphaBetaSearch<State, Action, String> searchStrategy;
 
 	public TablutDalo(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
-		Game rules = new GameAshtonTablut(this.getCurrentState(), 2, 2, "log", "White", "Black");
-        searchStrategy = new MinMaxSearch(rules,DEPTH);
+		Game rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
+		searchStrategy = new IterativeDeepeningAlphaBetaSearch<State, Action, String>(rules, 0.0, 1.0, timeout - 1);
 
 	}
 
@@ -36,7 +33,7 @@ public class TablutDalo extends TablutClient {
 			System.out.println("Default Setting:\nrole: white\ntimeout=5 sec\nipAddress=\"Localhost\"");
 			role = "white";
 			timeout = 5;
-			ipAddress="localhost";
+			ipAddress = "localhost";
 		} else {
 			role = args[0];
 			if (!role.equalsIgnoreCase("white") && !role.equalsIgnoreCase("black")) {
@@ -52,7 +49,7 @@ public class TablutDalo extends TablutClient {
 			}
 			ipAddress = args[2];
 		}
-		
+
 		System.out.println("Connecting to the server...");
 		TablutDalo client = null;
 		try {
@@ -88,15 +85,15 @@ public class TablutDalo extends TablutClient {
 
 		while (true) {
 			try {
-				this.read(); //reading JSON from server
+				this.read(); // reading JSON from server
 			} catch (ClassNotFoundException | IOException e1) {
 				System.out.println("Error reading the state: " + e1.getMessage());
 				System.exit(1);
 			}
 
 			state = this.getCurrentState();
-			// check if the game is finish 
-			
+			// check if the game is finish
+
 			// I won
 			if (this.getPlayer().equals(State.Turn.WHITE) && state.getTurn().equals(State.Turn.WHITEWIN)
 					|| this.getPlayer().equals(State.Turn.BLACK) && state.getTurn().equals(State.Turn.BLACKWIN)) {
@@ -114,18 +111,13 @@ public class TablutDalo extends TablutClient {
 				System.out.println("DRAW!");
 				System.exit(0);
 			}
-			
+
 			// My turn
 			else if (this.getPlayer().equals(this.getCurrentState().getTurn())) {
 				Action chosenMove = null;
-				try {
-					System.out.println("I am thinking...");
-					chosenMove = this.searchStrategy.choseMove(state,this.getPlayer().toString());
-					System.out.println("Chosen move: " + chosenMove);
-
-				} catch (IOException | ActionException e) {
-					System.out.println("Error choosing the move: " + e.getMessage());
-				}
+				System.out.println("I am thinking...");
+				chosenMove = this.searchStrategy.makeDecision(state);
+				System.out.println("Chosen move: " + chosenMove);
 				try {
 					this.write(chosenMove);
 				} catch (IOException | ClassNotFoundException e) {

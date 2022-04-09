@@ -1,0 +1,6 @@
+apr 09, 2022 11:29:12 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Players:	White	vs	Black
+apr 09, 2022 11:29:12 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Repeated moves allowed:	2	Cache:	2
+apr 09, 2022 11:29:12 AM it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut <init>
+FINE: Inizio partita
