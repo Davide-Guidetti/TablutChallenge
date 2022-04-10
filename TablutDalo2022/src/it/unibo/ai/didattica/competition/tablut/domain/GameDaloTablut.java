@@ -22,7 +22,6 @@ import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 public class GameDaloTablut extends GameAshtonTablut implements Game<State, Action, String> {
 	private static final String[] PLAYERS = { "white", "black" };
 	private boolean DEBUG = false;
-	private Logger loggGame;
 
 	public GameDaloTablut(State state, int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
 			String blackName) {
@@ -68,6 +67,61 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		} else {
 			state.setTurn(State.Turn.WHITE);
 		}
+		
+		//SECONDA PARTE CHECK MOVE
+
+		// a questo punto controllo lo stato per eventuali catture
+		if (state.getTurn().equalsTurn("W")) {
+			state = this.checkCaptureBlack(state, a);
+		} else if (state.getTurn().equalsTurn("B")) {
+			state = this.checkCaptureWhite(state, a);
+		}
+
+		// if something has been captured, clear cache for draws
+		if (this.movesWithutCapturing == 0) {
+			this.drawConditions.clear();
+			this.loggGame.fine("Capture! Draw cache cleared!");
+		}
+
+		// controllo pareggio
+		int trovati = 0;
+		for (State s : drawConditions) {
+
+			System.out.println(s.toString());
+
+			if (s.equals(state)) {
+				// DEBUG: //
+				// System.out.println("UGUALI:");
+				// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
+				// System.out.println("STATO NUOVO:\t" +
+				// state.toLinearString());
+
+				trovati++;
+				if (trovati > repeated_moves_allowed) {
+					state.setTurn(State.Turn.DRAW);
+					this.loggGame.fine("Partita terminata in pareggio per numero di stati ripetuti");
+					break;
+				}
+			} else {
+				// DEBUG: //
+				// System.out.println("DIVERSI:");
+				// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
+				// System.out.println("STATO NUOVO:\t" +
+				// state.toLinearString());
+			}
+		}
+		if (trovati > 0) {
+			this.loggGame.fine("Equal states found: " + trovati);
+		}
+		if (cache_size >= 0 && this.drawConditions.size() > cache_size) {
+			this.drawConditions.remove(0);
+		}
+		this.drawConditions.add(state.clone());
+
+		this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
+
+		this.loggGame.fine("Stato:\n" + state.toString());
+		System.out.println("Stato:\n" + state.toString());
 
 		return state;
 	}
@@ -76,7 +130,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	public double getUtility(State stato, String player) {
 
 		System.out.println("state: " + stato.boardString());
-		
+
 		// check terminal state
 		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("white")) {
 			return 1.0;
@@ -114,10 +168,10 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				// calcolo distanza re da piastrelle di salvezza
 				if (b[i][j].equals(Pawn.KING)) {
 					found = true;
-					if((i==0 && (j==2 || j==3 || j==6 || j==7)) ||
-						(i==8 && (j==2 || j==3 || j==6 || j==7)) ||
-						(j==0 && (i==2 || i==3 || i==6 || i==7)) ||
-						(j==8 && (i==2 || i==3 || i==6 || i==7))) {
+					if ((i == 0 && (j == 2 || j == 3 || j == 6 || j == 7))
+							|| (i == 8 && (j == 2 || j == 3 || j == 6 || j == 7))
+							|| (j == 0 && (i == 2 || i == 3 || i == 6 || i == 7))
+							|| (j == 8 && (i == 2 || i == 3 || i == 6 || i == 7))) {
 						return this.getPlayer(stato).equalsIgnoreCase("white") ? 1.0 : 0.0;
 					}
 					if ((i >= 3 && i <= 5) || (j >= 3 && j <= 5)) {
@@ -212,7 +266,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				}
 			}
 		}
-		if(found==false) 
+		if (found == false)
 			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : 1.0;
 		// CASO B
 		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * 0.25;
@@ -320,11 +374,12 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 			contCampleBlack++;
 		}
 		value += ((contCampleBlack - contCampleWhite * 2) / 32 + 0.5) * 0.15;
-		
-		if (this.getPlayer(stato)=="black") value=1-value;
-		
-		System.out.println("value: "+value);
-		
+
+		if (this.getPlayer(stato) == "black")
+			value = 1 - value;
+
+		System.out.println("value: " + value);
+
 		return value;
 	}
 

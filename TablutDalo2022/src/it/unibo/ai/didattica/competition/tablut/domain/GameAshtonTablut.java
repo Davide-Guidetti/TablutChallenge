@@ -26,23 +26,23 @@ public class GameAshtonTablut implements Game {
 	/**
 	 * Number of repeated states that can occur before a draw
 	 */
-	private int repeated_moves_allowed;
+	protected int repeated_moves_allowed;
 
 	/**
 	 * Number of states kept in memory. negative value means infinite.
 	 */
-	private int cache_size;
+	protected int cache_size;
 	/**
 	 * Counter for the moves without capturing that have occurred
 	 */
-	private int movesWithutCapturing;
+	protected int movesWithutCapturing;
 	private String gameLogName;
 	private File gameLog;
 	private FileHandler fh;
-	private Logger loggGame;
+	protected Logger loggGame;
 	protected List<String> citadels;
 	// private List<String> strangeCitadels;
-	private List<State> drawConditions;
+	protected List<State> drawConditions;
 
 	public GameAshtonTablut(int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
 			String blackName) {
@@ -323,7 +323,7 @@ public class GameAshtonTablut implements Game {
 		return state;
 	}
 
-	private State checkCaptureWhite(State state, Action a) {
+	protected State checkCaptureWhite(State state, Action a) {
 		// controllo se mangio a destra
 		if (a.getColumnTo() < state.getBoard().length - 2
 				&& state.getPawn(a.getRowTo(), a.getColumnTo() + 1).equalsPawn("B")
@@ -673,7 +673,7 @@ public class GameAshtonTablut implements Game {
 		return state;
 	}
 
-	private State checkCaptureBlack(State state, Action a) {
+	protected State checkCaptureBlack(State state, Action a) {
 
 		this.checkCaptureBlackPawnRight(state, a);
 		this.checkCaptureBlackPawnLeft(state, a);
