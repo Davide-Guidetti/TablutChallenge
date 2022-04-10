@@ -1,22 +1,23 @@
 package it.unibo.ai.didattica.competition.tablut.client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.google.gson.Gson;
-
-import it.unibo.ai.didattica.competition.tablut.domain.*;
+import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.Game;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
+import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 /**
- * 
+ *
  * @author A. Piretti, Andrea Galassi
  *
  */
@@ -28,11 +29,11 @@ public class TablutRandomClient extends TablutClient {
 		super(player, name, timeout, ipAddress);
 		game = gameChosen;
 	}
-	
+
 	public TablutRandomClient(String player, String name, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		this(player, name, 4, timeout, ipAddress);
 	}
-	
+
 	public TablutRandomClient(String player, int timeout, String ipAddress) throws UnknownHostException, IOException {
 		this(player, "random", 4, timeout, ipAddress);
 	}
@@ -105,8 +106,8 @@ public class TablutRandomClient extends TablutClient {
 			System.exit(4);
 		}
 
-		List<int[]> pawns = new ArrayList<int[]>();
-		List<int[]> empty = new ArrayList<int[]>();
+		List<int[]> pawns = new ArrayList<>();
+		List<int[]> empty = new ArrayList<>();
 
 		System.out.println("You are player " + this.getPlayer().toString() + "!");
 
@@ -247,7 +248,6 @@ public class TablutRandomClient extends TablutClient {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					;
 					while (!found) {
 						selected = pawns.get(new Random().nextInt(pawns.size() - 1));
 						String from = this.getCurrentState().getBox(selected[0], selected[1]);

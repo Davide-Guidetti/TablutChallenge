@@ -9,5 +9,5 @@ public class TablutHumanWhiteClient {
 		String[] array = new String[]{"WHITE"};
 		TablutHumanClient.main(array);
 	}
-	
+
 }

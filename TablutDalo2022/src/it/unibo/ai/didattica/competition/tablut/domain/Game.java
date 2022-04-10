@@ -1,7 +1,5 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
-import it.unibo.ai.didattica.competition.tablut.domain.Action;
-import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
 import it.unibo.ai.didattica.competition.tablut.exceptions.CitadelException;
@@ -22,7 +20,7 @@ public interface Game {
 	/**
 	 * This method checks an action in a state: if it is correct the state is
 	 * going to be changed, if it is wrong it throws a specific exception
-	 * 
+	 *
 	 * @param state
 	 *            the state of the game
 	 * @param a

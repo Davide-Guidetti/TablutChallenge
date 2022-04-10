@@ -11,12 +11,12 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
-public class TablutDalo extends TablutClient {
+public class TablutDaloWhite extends TablutClient {
 	public static final String NAME = "Cliente";
 	public static final int DEPTH = 4;
 	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 
-	public TablutDalo(String player, String name, int timeout, String ipAddress)
+	public TablutDaloWhite(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
 		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
@@ -51,9 +51,9 @@ public class TablutDalo extends TablutClient {
 		}
 
 		System.out.println("Connecting to the server...");
-		TablutDalo client = null;
+		TablutDaloWhite client = null;
 		try {
-			client = new TablutDalo(role, NAME, timeout, ipAddress);
+			client = new TablutDaloWhite(role, NAME, timeout, ipAddress);
 		} catch (InvalidParameterException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);

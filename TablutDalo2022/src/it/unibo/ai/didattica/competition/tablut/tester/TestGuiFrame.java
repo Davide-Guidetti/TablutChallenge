@@ -11,14 +11,20 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import it.unibo.ai.didattica.competition.tablut.domain.*;
-import it.unibo.ai.didattica.competition.tablut.domain.State.*;
+import it.unibo.ai.didattica.competition.tablut.domain.Game;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State;
+import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
+import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 
 public class TestGuiFrame extends JFrame{
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	private Gui theGui;
@@ -40,13 +46,13 @@ public class TestGuiFrame extends JFrame{
 	private JButton aggAzione;
 	private JRadioButton turno;
 	private JRadioButton turno2;
-	
-	
-	
+
+
+
 	public TestGuiFrame(int game) {
-		
+
 		super();
-		
+
 		switch (game) {
 		case 1:
 			Pawn board[][] = new Pawn[9][9];
@@ -83,7 +89,7 @@ public class TestGuiFrame extends JFrame{
 			state = new StateBrandub();
 			theGame=new GameTablut(10);
 			state.setBoard(board2);
-			break;	
+			break;
 		case 4:
 			Pawn board3[][] = new Pawn[9][9];
 			for(int i=0;i<9;i++){
@@ -96,15 +102,15 @@ public class TestGuiFrame extends JFrame{
 			state.setTurn(State.Turn.WHITE);
 			theGame=new GameAshtonTablut(0, -1, "test", "testW", "testB");
 			state.setBoard(board3);
-			break;	
+			break;
 		default:
 			System.out.println("Error in game selection");
 			System.exit(4);
 		}
-		
+
 		theGui=new Gui(game);
 		theGui.update(state);
-		
+
 		pannello1 = new JPanel();
 		pannello2 = new JPanel();
 		nere = new JTextField("");
@@ -157,6 +163,6 @@ public class TestGuiFrame extends JFrame{
 	}
 
 
-	
-	
+
+
 }

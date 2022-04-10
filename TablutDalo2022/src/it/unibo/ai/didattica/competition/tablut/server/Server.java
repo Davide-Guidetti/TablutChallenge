@@ -9,26 +9,42 @@ import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.logging.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
-import it.unibo.ai.didattica.competition.tablut.domain.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import com.google.gson.Gson;
+
+import it.unibo.ai.didattica.competition.tablut.domain.Action;
+import it.unibo.ai.didattica.competition.tablut.domain.Game;
+import it.unibo.ai.didattica.competition.tablut.domain.GameAshtonTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
+import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 import it.unibo.ai.didattica.competition.tablut.util.Configuration;
 import it.unibo.ai.didattica.competition.tablut.util.StreamUtils;
 
-import com.google.gson.Gson;
-import org.apache.commons.cli.*;
-
 /**
  * this class represent the server of the match: 2 clients with TCP connection
  * can connect and start to play
- * 
+ *
  * @author A.Piretti, Andrea Galassi
  *
  */
 public class Server implements Runnable {
-	
+
 	/**
 	 * Timeout for waiting for a client to connect
 	 */
@@ -110,12 +126,12 @@ public class Server implements Runnable {
 
 	/**
 	 * Server initialiazer.
-	 * 
+	 *
 	 * @param args
 	 *            the time for the move, the size of the cache for monitoring
 	 *            draws, the number of errors allowed, the type of game, whether
 	 *            the GUI should be used or not
-	 * 
+	 *
 	 */
 	public static void main(String[] args) {
 		int time = 60;
@@ -223,7 +239,7 @@ public class Server implements Runnable {
 	/**
 	 * This class represents the stream who is waiting for the move from the
 	 * client (JSON format)
-	 * 
+	 *
 	 * @author A.Piretti
 	 *
 	 */
@@ -234,6 +250,7 @@ public class Server implements Runnable {
 			this.theStream = theS;
 		}
 
+		@Override
 		public void run() {
 			try {
 				theGson = StreamUtils.readString(this.theStream);
@@ -256,6 +273,7 @@ public class Server implements Runnable {
 			this.serversocket = serverSocket;
 		}
 
+		@Override
 		public void run() {
 			try {
 				socket = serversocket.accept();
@@ -273,6 +291,7 @@ public class Server implements Runnable {
 	 * clients, check the move and update the state. There is a timeout that
 	 * interrupts games that last too much
 	 */
+	@Override
 	public void run() {
 		/**
 		 * Number of hours that a game can last before the timeout
@@ -362,7 +381,7 @@ public class Server implements Runnable {
 		try {
 			this.socketWhite = new ServerSocket(Configuration.whitePort);
 			this.socketBlack = new ServerSocket(Configuration.blackPort);
-			
+
 
 			// ESTABLISHING CONNECTION
 			tc = new TCPConnection(socketWhite);
@@ -384,7 +403,7 @@ public class Server implements Runnable {
 				loggSys.warning("Closing system for timeout!");
 				System.exit(0);
 			}
-			
+
 			white = tc.getSocket();
 			loggSys.fine("White player connected");
 			whiteMove = new DataInputStream(white.getInputStream());
@@ -423,7 +442,7 @@ public class Server implements Runnable {
 			System.out.println("White player name:\t" + whiteName);
 			loggSys.fine("White player name:\t" + whiteName);
 
-			
+
 			// ESTABLISHING CONNECTION
 			tc = new TCPConnection(socketBlack);
 			t = new Thread(tc);
@@ -666,7 +685,7 @@ public class Server implements Runnable {
 			}
 
 		}
-		
+
 		System.exit(0);
 	}
 

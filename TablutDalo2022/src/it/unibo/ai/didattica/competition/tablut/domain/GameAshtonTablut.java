@@ -11,13 +11,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import it.unibo.ai.didattica.competition.tablut.exceptions.*;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.CitadelException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingCitadelException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.DiagonalException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.OccupitedException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
+import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 
 /**
- * 
+ *
  * Game engine inspired by the Ashton Rules of Tablut
- * 
- * 
+ *
+ *
  * @author A. Piretti, Andrea Galassi
  *
  */
@@ -82,8 +91,8 @@ public class GameAshtonTablut implements Game {
 		loggGame.fine("Repeated moves allowed:\t" + repeated_moves_allowed + "\tCache:\t" + cache_size);
 		loggGame.fine("Inizio partita");
 		loggGame.fine("Stato:\n" + state.toString());
-		drawConditions = new ArrayList<State>();
-		this.citadels = new ArrayList<String>();
+		drawConditions = new ArrayList<>();
+		this.citadels = new ArrayList<>();
 		// this.strangeCitadels = new ArrayList<String>();
 		this.citadels.add("a4");
 		this.citadels.add("a5");
@@ -742,7 +751,7 @@ public class GameAshtonTablut implements Game {
 	public void clearDrawConditions() {
 		drawConditions.clear();
 	}
-	
+
 
 	@Override
 	public void endGame(State state) {

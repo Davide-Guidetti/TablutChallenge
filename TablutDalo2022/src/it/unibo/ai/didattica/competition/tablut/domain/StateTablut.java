@@ -6,9 +6,9 @@ import java.io.Serializable;
 /**
  * This class represents a state of a match of Tablut (classical or second
  * version)
- * 
+ *
  * @author A.Piretti
- * 
+ *
  */
 public class StateTablut extends State implements Serializable {
 
@@ -58,6 +58,7 @@ public class StateTablut extends State implements Serializable {
 
 	}
 
+	@Override
 	public StateTablut clone() {
 		StateTablut result = new StateTablut();
 
@@ -74,15 +75,13 @@ public class StateTablut extends State implements Serializable {
 		result.setTurn(this.turn);
 		return result;
 	}
-	
+
 
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (this.getClass() != obj.getClass())
+		if ((obj == null) || (this.getClass() != obj.getClass()))
 			return false;
 		StateTablut other = (StateTablut) obj;
 		if (this.board == null) {

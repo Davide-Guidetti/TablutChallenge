@@ -11,12 +11,12 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
-public class TablutDalo extends TablutClient {
+public class TablutDaloBlack extends TablutClient {
 	public static final String NAME = "Cliente";
 	public static final int DEPTH = 4;
 	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 
-	public TablutDalo(String player, String name, int timeout, String ipAddress)
+	public TablutDaloBlack(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
 		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
@@ -31,7 +31,7 @@ public class TablutDalo extends TablutClient {
 		if (args.length != 3) {
 			System.out.println("Errore args: <role> <timeout> <ipAddress>");
 			System.out.println("Default Setting:\nrole: white\ntimeout=5 sec\nipAddress=\"Localhost\"");
-			role = "white";
+			role = "black";
 			timeout = 5;
 			ipAddress = "localhost";
 		} else {
@@ -51,9 +51,9 @@ public class TablutDalo extends TablutClient {
 		}
 
 		System.out.println("Connecting to the server...");
-		TablutDalo client = null;
+		TablutDaloBlack client = null;
 		try {
-			client = new TablutDalo(role, NAME, timeout, ipAddress);
+			client = new TablutDaloBlack(role, NAME, timeout, ipAddress);
 		} catch (InvalidParameterException e) {
 			System.out.println(e.getMessage());
 			System.exit(1);

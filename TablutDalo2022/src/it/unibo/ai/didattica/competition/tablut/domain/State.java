@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Abstract class for a State of a game We have a representation of the board
  * and the turn
- * 
+ *
  * @author Andrea Piretti
  *
  */
@@ -15,7 +15,7 @@ public abstract class State {
 	/**
 	 * Turn represent the player that has to move or the end of the game(A win
 	 * by a player or a draw)
-	 * 
+	 *
 	 * @author A.Piretti
 	 */
 	public enum Turn {
@@ -30,15 +30,16 @@ public abstract class State {
 			return (otherName == null) ? false : turn.equals(otherName);
 		}
 
+		@Override
 		public String toString() {
 			return turn;
 		}
 	}
 
 	/**
-	 * 
+	 *
 	 * Pawn represents the content of a box in the board
-	 * 
+	 *
 	 * @author A.Piretti
 	 *
 	 */
@@ -54,6 +55,7 @@ public abstract class State {
 			return (otherPawn == null) ? false : pawn.equals(otherPawn);
 		}
 
+		@Override
 		public String toString() {
 			return pawn;
 		}
@@ -73,9 +75,9 @@ public abstract class State {
 
 	public String boardString() {
 		StringBuffer result = new StringBuffer();
-		for (int i = 0; i < this.board.length; i++) {
+		for (Pawn[] element : this.board) {
 			for (int j = 0; j < this.board.length; j++) {
-				result.append(this.board[i][j].toString());
+				result.append(element[j].toString());
 				if (j == 8) {
 					result.append("\n");
 				}
@@ -114,7 +116,7 @@ public abstract class State {
 
 	/**
 	 * this function tells the pawn inside a specific box on the board
-	 * 
+	 *
 	 * @param row
 	 *            represents the row of the specific box
 	 * @param column
@@ -127,12 +129,12 @@ public abstract class State {
 
 	/**
 	 * this function remove a specified pawn from the board
-	 * 
+	 *
 	 * @param row
 	 *            represents the row of the specific box
 	 * @param column
 	 *            represents the column of the specific box
-	 * 
+	 *
 	 */
 	public void removePawn(int row, int column) {
 		this.board[row][column] = Pawn.EMPTY;
@@ -154,9 +156,7 @@ public abstract class State {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (this.getClass() != obj.getClass())
+		if ((obj == null) || (this.getClass() != obj.getClass()))
 			return false;
 		State other = (State) obj;
 		if (this.board == null) {
@@ -195,6 +195,7 @@ public abstract class State {
 		return ret;
 	}
 
+	@Override
 	public State clone() {
 		Class<? extends State> stateclass = this.getClass();
 		Constructor<? extends State> cons = null;
@@ -228,9 +229,9 @@ public abstract class State {
 	 */
 	public int getNumberOf(Pawn color) {
 		int count = 0;
-		for (int i = 0; i < board.length; i++) {
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[i][j] == color)
+		for (Pawn[] element : board) {
+			for (int j = 0; j < element.length; j++) {
+				if (element[j] == color)
 					count++;
 			}
 		}

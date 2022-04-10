@@ -10,7 +10,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.Action;
 public class PawnException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public PawnException(Action a)
 	{
 		super("The player is tryng to move a wrong pawn: "+a.toString());

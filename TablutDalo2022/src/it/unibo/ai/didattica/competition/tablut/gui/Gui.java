@@ -1,28 +1,28 @@
 package it.unibo.ai.didattica.competition.tablut.gui;
 
-import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 /**
- * 
+ *
  * This class represent an instrument that control the graphics
  * @author A.Piretti
  *
  */
 public class Gui {
-	
+
 	Background frame;
 	private int game;
-	
+
 	public Gui(int game) {
 		super();
 		this.game = game;
 		initGUI();
 		show();
 	}
-	
-	
+
+
 	/**
 	 * Update the graphic whit a new state of the game
 	 * @param aState represent the new state of the game
@@ -30,8 +30,8 @@ public class Gui {
 	public void update(State aState) {
 		frame.setaState(aState);
 		frame.repaint();
-	}	
-	
+	}
+
 	/**
 	 * Initialization
 	 */
@@ -39,22 +39,22 @@ public class Gui {
 		switch (this.game) {
 		case 1:
 			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			frame.setSize(280, 300);
 			break;
 		case 2:
 			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			frame.setSize(280, 300);
 			break;
 		case 3:
 			frame = new BackgroundBrandub();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			frame.setSize(280, 300);
 			break;
 		case 4:
 			frame = new BackgroundTablut();
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			frame.setSize(280, 300);
 			break;
 		default:
@@ -62,7 +62,7 @@ public class Gui {
 			System.exit(4);
 		}
 	}
-	
+
 	/**
 	 * Display the window
 	 */

@@ -17,7 +17,7 @@ import it.unibo.ai.didattica.competition.tablut.util.StreamUtils;
 
 /**
  * Classe astratta di un client per il gioco Tablut
- * 
+ *
  * @author Andrea Piretti
  *
  */
@@ -51,7 +51,7 @@ public abstract class TablutClient implements Runnable {
 
 	/**
 	 * Creates a new player initializing the sockets and the logger
-	 * 
+	 *
 	 * @param player
 	 *            The role of the player (black or white)
 	 * @param name
@@ -87,7 +87,7 @@ public abstract class TablutClient implements Runnable {
 	/**
 	 * Creates a new player initializing the sockets and the logger. The server
 	 * is supposed to be communicating on the same machine of this player.
-	 * 
+	 *
 	 * @param player
 	 *            The role of the player (black or white)
 	 * @param name
@@ -105,7 +105,7 @@ public abstract class TablutClient implements Runnable {
 	 * Creates a new player initializing the sockets and the logger. Timeout is
 	 * set to be 60 seconds. The server is supposed to be communicating on the
 	 * same machine of this player.
-	 * 
+	 *
 	 * @param player
 	 *            The role of the player (black or white)
 	 * @param name
@@ -120,7 +120,7 @@ public abstract class TablutClient implements Runnable {
 	/**
 	 * Creates a new player initializing the sockets and the logger. Timeout is
 	 * set to be 60 seconds.
-	 * 
+	 *
 	 * @param player
 	 *            The role of the player (black or white)
 	 * @param name

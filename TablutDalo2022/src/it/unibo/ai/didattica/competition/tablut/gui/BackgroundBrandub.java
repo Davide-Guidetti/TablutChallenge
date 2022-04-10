@@ -8,12 +8,12 @@ import javax.imageio.ImageIO;
 
 
 public class BackgroundBrandub extends Background{
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-		
+
 	public BackgroundBrandub()
 	{
 		super();

@@ -6,9 +6,9 @@ import java.security.InvalidParameterException;
 
 /**
  * this class represents an action of a player
- * 
+ *
  * @author A.Piretti
- * 
+ *
  */
 public class Action implements Serializable {
 
@@ -59,6 +59,7 @@ public class Action implements Serializable {
 		this.turn = turn;
 	}
 
+	@Override
 	public String toString() {
 		return "Turn: " + this.turn + " " + "Pawn from " + from + " to " + to;
 	}

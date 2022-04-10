@@ -2,22 +2,12 @@ package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 
 import aima.core.search.adversarial.Game;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ActionException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.BoardException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.CitadelException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingCitadelException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ClimbingException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.DiagonalException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.OccupitedException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.PawnException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.StopException;
-import it.unibo.ai.didattica.competition.tablut.exceptions.ThroneException;
 
 public class GameDaloTablut extends GameAshtonTablut implements Game<State, Action, String> {
 	private static final String[] PLAYERS = { "white", "black" };
@@ -67,8 +57,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		} else {
 			state.setTurn(State.Turn.WHITE);
 		}
-		
-		//SECONDA PARTE CHECK MOVE
+
+		// SECONDA PARTE CHECK MOVE
 
 		// a questo punto controllo lo stato per eventuali catture
 		if (state.getTurn().equalsTurn("W")) {
@@ -126,10 +116,11 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return state;
 	}
 
+	// HEURISTIC FUNCTION
 	@Override
 	public double getUtility(State stato, String player) {
 
-		System.out.println("state: " + stato.boardString());
+		//System.out.println("state: " + stato.boardString());
 
 		// check terminal state
 		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("white")) {
@@ -168,6 +159,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				// calcolo distanza re da piastrelle di salvezza
 				if (b[i][j].equals(Pawn.KING)) {
 					found = true;
+					// re in escape box
 					if ((i == 0 && (j == 2 || j == 3 || j == 6 || j == 7))
 							|| (i == 8 && (j == 2 || j == 3 || j == 6 || j == 7))
 							|| (j == 0 && (i == 2 || i == 3 || i == 6 || i == 7))
@@ -177,7 +169,43 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					if ((i >= 3 && i <= 5) || (j >= 3 && j <= 5)) {
 						value += 0.0;
 					} else {
+						// check if king can escape
+						System.out.println("CHECK SE IN TRAIETTORIA");
+						int contPawn = 0;
+						for (int row = 0; row < i; row++) {
+							if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
+								contPawn++;
+							}
+						}
+						if (contPawn == 0)
+							return 0.8;
+						contPawn = 0;
+						for (int row = i + 1; row < 9; row++) {
+							if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
+								contPawn++;
+							}
+						}
+						if (contPawn == 0)
+							return 0.8;
+						contPawn = 0;
+						for (int column = 0; column < j; column++) {
+							if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
+								contPawn++;
+							}
+						}
+						if (contPawn == 0)
+							return 0.8;
+						contPawn = 0;
+						for (int column = j + 1; column < 9; column++) {
+							if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
+								contPawn++;
+							}
+						}
+						if (contPawn == 0)
+							return 0.8;
+
 						value += 0.2;
+
 					}
 					// CASO G
 					// re nel castello
@@ -251,14 +279,24 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					} else
 					// re con neri vicino
 					if (stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
-						soldierBlack++;
+						value += 0;
 					} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
-						soldierBlack++;
+						value += 0;
 					} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
-						soldierBlack++;
+						value += 0;
 					} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
-						soldierBlack++;
+						value += 0;
 					}
+
+					// controllo cattura re da parte del nero
+					if (this.getPlayer(stato).equalsIgnoreCase("blak")) {
+						if ((stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.BLACK))
+								|| (stato.getBox(i, j + 1).equals(Pawn.BLACK)
+										&& stato.getBox(i, j - 1).equals(Pawn.BLACK))) {
+							return 0.0;
+						}
+					}
+
 					// tutti gli altri casi
 					else {
 						value += 0.25;
@@ -266,7 +304,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				}
 			}
 		}
-		if (found == false)
+		if (!found)
 			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : 1.0;
 		// CASO B
 		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * 0.25;
@@ -441,7 +479,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 			throw new IllegalArgumentException("no moves");
 		}
-
+		Collections.shuffle(resultChecked);
 		return resultChecked;
 	}
 

@@ -1,13 +1,22 @@
 /**
- * 
+ *
  */
 package it.unibo.ai.didattica.competition.tablut.logreader;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 /**
@@ -24,15 +33,15 @@ public class LogReader {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		Map<String, Integer> wins = new HashMap<String, Integer>();
-		Map<String, Integer> draws = new HashMap<String, Integer>();
-		Map<String, Integer> losses = new HashMap<String, Integer>();
-		Map<String, Integer> winmoves = new HashMap<String, Integer>();
-		Map<String, Integer> lossmoves = new HashMap<String, Integer>();
-		Map<String, Integer> captures = new HashMap<String, Integer>();
-		Map<String, Integer> captured = new HashMap<String, Integer>();
-		Map<String, Integer> games = new HashMap<String, Integer>();
-		Map<String, Integer> moves = new HashMap<String, Integer>();
+		Map<String, Integer> wins = new HashMap<>();
+		Map<String, Integer> draws = new HashMap<>();
+		Map<String, Integer> losses = new HashMap<>();
+		Map<String, Integer> winmoves = new HashMap<>();
+		Map<String, Integer> lossmoves = new HashMap<>();
+		Map<String, Integer> captures = new HashMap<>();
+		Map<String, Integer> captured = new HashMap<>();
+		Map<String, Integer> games = new HashMap<>();
+		Map<String, Integer> moves = new HashMap<>();
 
 		File game_out_file = new File("games.txt");
 		if (!game_out_file.exists()) {

@@ -10,10 +10,10 @@ import javax.imageio.ImageIO;
 public class BackgroundTablut extends Background {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public BackgroundTablut()
 	{
 		super();

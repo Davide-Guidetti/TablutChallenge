@@ -10,7 +10,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.Action;
 public class BoardException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public BoardException(Action a)
 	{
 		super("The move is out of the board: "+a.toString());

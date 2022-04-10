@@ -10,7 +10,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 /**
- * 
+ *
  * @author A. Piretti, Andrea Galassi
  *
  */

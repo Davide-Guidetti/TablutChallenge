@@ -18,9 +18,9 @@ public class AggiungiNero implements ActionListener {
 	private JTextField posizione;
 	private State state;
 	private TestGuiFrame ret;
-	
-	
-	
+
+
+
 	public AggiungiNero(Gui theGui, JTextField field, State state, TestGuiFrame ret) {
 		super();
 		this.theGui = theGui;
@@ -35,7 +35,7 @@ public class AggiungiNero implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		String casella = posizione.getText();
 		posizione.setText("");
-		Action a = null; 
+		Action a = null;
 		try {
 			a = new Action(casella, casella, Turn.WHITE);
 			int column = a.getColumnFrom();
