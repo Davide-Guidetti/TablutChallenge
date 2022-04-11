@@ -12,6 +12,19 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 public class GameDaloTablut extends GameAshtonTablut implements Game<State, Action, String> {
 	private static final String[] PLAYERS = { "white", "black" };
 	private boolean DEBUG = false;
+	private Pawn[][] b;
+
+	public static final double soldierNearCastleValue = 0.12; // CASO E
+	public static final double soldierNearCampValue = 0.12; // CASO F
+	public static final double checkPositionKing = 0.22; // CASO G
+	public static final double remainSoldierValue = 0.22; // CASO B
+	public static final double kingCanEscapeValue = 0.22;
+	public static final double pawnCanBlockEscapeValue = 0.02;
+
+	public static double getMaxValueHeuristic() {
+		return soldierNearCastleValue + soldierNearCampValue + checkPositionKing + remainSoldierValue
+				+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16); // 16 numero pedoni neri
+	}
 
 	public GameDaloTablut(State state, int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
 			String blackName) {
@@ -119,42 +132,35 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	// HEURISTIC FUNCTION
 	@Override
 	public double getUtility(State stato, String player) {
-
-		//System.out.println("state: " + stato.boardString());
+		//System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue + checkPositionKing + remainSoldierValue
+		//		+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
+		// System.out.println("state: " + stato.boardString());
 
 		// check terminal state
 		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("white")) {
-			return 1.0;
+			return GameDaloTablut.getMaxValueHeuristic();
 		}
 		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("black")) {
 			return 0.0;
 		}
 		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equalsIgnoreCase("black")) {
-			return 1.0;
+			return GameDaloTablut.getMaxValueHeuristic();
 		}
 		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equalsIgnoreCase("white")) {
 			return 0;
 		}
 		if (stato.getTurn().equals(Turn.DRAW)) {
-			return 0.5;
+			return GameDaloTablut.getMaxValueHeuristic() / 2;
 		}
 
 		double value = 0;
 		int contWhiteSoldier = 0;
 		int contBlackSoldier = 0;
-		Pawn[][] b = stato.getBoard();
+		b = stato.getBoard();
 		boolean found = false;
 
 		for (int i = 0; i < stato.getBoard().length; i++) {
 			for (int j = 0; j < stato.getBoard().length; j++) {
-				// conto i pedoni bianchi
-				if (b[i][j].equals(Pawn.WHITE)) {
-					contWhiteSoldier++;
-				}
-				// conto i pedoni neri
-				if (b[i][j].equals(Pawn.BLACK)) {
-					contBlackSoldier++;
-				}
 				// CASO A
 				// calcolo distanza re da piastrelle di salvezza
 				if (b[i][j].equals(Pawn.KING)) {
@@ -164,151 +170,193 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 							|| (i == 8 && (j == 2 || j == 3 || j == 6 || j == 7))
 							|| (j == 0 && (i == 2 || i == 3 || i == 6 || i == 7))
 							|| (j == 8 && (i == 2 || i == 3 || i == 6 || i == 7))) {
-						return this.getPlayer(stato).equalsIgnoreCase("white") ? 1.0 : 0.0;
+						return this.getPlayer(stato).equalsIgnoreCase("white") ? GameDaloTablut.getMaxValueHeuristic()
+								: 0.0;
 					}
-					if ((i >= 3 && i <= 5) || (j >= 3 && j <= 5)) {
-						value += 0.0;
-					} else {
+					if (!((i >= 3 && i <= 5) || (j >= 3 && j <= 5))) {
 						// check if king can escape
-						System.out.println("CHECK SE IN TRAIETTORIA");
-						int contPawn = 0;
-						for (int row = 0; row < i; row++) {
-							if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
-								contPawn++;
-							}
-						}
-						if (contPawn == 0)
-							return 0.8;
-						contPawn = 0;
-						for (int row = i + 1; row < 9; row++) {
-							if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
-								contPawn++;
-							}
-						}
-						if (contPawn == 0)
-							return 0.8;
-						contPawn = 0;
-						for (int column = 0; column < j; column++) {
-							if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
-								contPawn++;
-							}
-						}
-						if (contPawn == 0)
-							return 0.8;
-						contPawn = 0;
-						for (int column = j + 1; column < 9; column++) {
-							if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
-								contPawn++;
-							}
-						}
-						if (contPawn == 0)
-							return 0.8;
-
-						value += 0.2;
-
+						value += this.kingCanEscape(i, j, kingCanEscapeValue);
 					}
 					// CASO G
-					// re nel castello
-					int soldierBlack = 0;
-					if (i == 4 && j == 4) {
-						if (b[3][4].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[4][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[4][3].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[4][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						value += (4 - soldierBlack) / 4 * 0.25;
-					} else
-					// re adiacente al castello
-					if (i == 3 && j == 4) {
-						if (b[3][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[3][3].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[2][4].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						value += (3 - soldierBlack) / 3 * 0.25;
-					} else if (i == 5 && j == 4) {
-						if (b[5][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[5][3].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[6][4].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						value += (3 - soldierBlack) / 3 * 0.25;
-					} else if (i == 4 && j == 3) {
-						if (b[3][3].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[4][2].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[5][3].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						value += (3 - soldierBlack) / 3 * 0.25;
-					} else if (i == 4 && j == 5) {
-						if (b[4][6].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[3][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						if (b[5][5].equals(Pawn.BLACK)) {
-							soldierBlack++;
-						}
-						value += (3 - soldierBlack) / 3 * 0.25;
-					}
-					// re vicino ad un campo
-					else if ((i == 1 && j == 3) || (i == 1 && j == 5) || (i == 2 && j == 4) || (i == 3 && j == 1)
-							|| (i == 4 && j == 2) || (i == 5 && j == 1) || (i == 6 && j == 4) || (i == 7 && j == 5)
-							|| (i == 7 && j == 3) || (i == 3 && j == 7) || (i == 4 && j == 6) || (i == 5 && j == 7)) {
-						value += 0;
-					} else
-					// re con neri vicino
-					if (stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
-						value += 0;
-					} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
-						value += 0;
-					} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
-						value += 0;
-					} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
-						value += 0;
-					}
-
-					// controllo cattura re da parte del nero
-					if (this.getPlayer(stato).equalsIgnoreCase("blak")) {
-						if ((stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.BLACK))
-								|| (stato.getBox(i, j + 1).equals(Pawn.BLACK)
-										&& stato.getBox(i, j - 1).equals(Pawn.BLACK))) {
-							return 0.0;
-						}
-					}
-
-					// tutti gli altri casi
-					else {
-						value += 0.25;
-					}
+					value += this.checkPositionKing(i, j, stato, checkPositionKing);
 				}
+				// conto i pedoni bianchi
+				if (b[i][j].equals(Pawn.WHITE)) {
+					contWhiteSoldier++;
+				}
+				// conto i pedoni neri
+				if (b[i][j].equals(Pawn.BLACK)) {
+					contBlackSoldier++;
+					// controllo se il pedone blocca una uscita
+					value += pawnCanBlockEscape(i, j, pawnCanBlockEscapeValue);
+				}
+
 			}
 		}
 		if (!found)
-			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : 1.0;
-		// CASO B
-		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * 0.25;
+			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : GameDaloTablut.getMaxValueHeuristic();
+		// CASO B soldati rimanenti
+		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * remainSoldierValue;
 		// CASO E controllo castello
+		value += this.soldierNearCastle(soldierNearCastleValue);
+		// CASO F controllo campi
+		value += this.soldierNearCamp(soldierNearCampValue);
+
+		if (this.getPlayer(stato) == "black")
+			value = GameDaloTablut.getMaxValueHeuristic() - value;
+
+		System.out.println("value: " + value);
+
+		return value;
+	}
+
+	private double checkPositionKing(int i, int j, State stato, double weight) {
+		// re nel castello
+		int soldierBlack = 0;
+		double value = 0;
+		if (i == 4 && j == 4) {
+			if (b[3][4].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[4][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[4][3].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[4][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			value += (4 - soldierBlack) / 4 * weight;
+		} else
+		// re adiacente al castello
+		if (i == 3 && j == 4) {
+			if (b[3][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[3][3].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[2][4].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			value += (3 - soldierBlack) / 3 * weight;
+		} else if (i == 5 && j == 4) {
+			if (b[5][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[5][3].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[6][4].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			value += (3 - soldierBlack) / 3 * weight;
+		} else if (i == 4 && j == 3) {
+			if (b[3][3].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[4][2].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[5][3].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			value += (3 - soldierBlack) / 3 * weight;
+		} else if (i == 4 && j == 5) {
+			if (b[4][6].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[3][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			if (b[5][5].equals(Pawn.BLACK)) {
+				soldierBlack++;
+			}
+			value += (3 - soldierBlack) / 3 * weight;
+		}
+		// re vicino ad un campo
+		else if ((i == 1 && j == 3) || (i == 1 && j == 5) || (i == 2 && j == 4) || (i == 3 && j == 1)
+				|| (i == 4 && j == 2) || (i == 5 && j == 1) || (i == 6 && j == 4) || (i == 7 && j == 5)
+				|| (i == 7 && j == 3) || (i == 3 && j == 7) || (i == 4 && j == 6) || (i == 5 && j == 7)) {
+			value += 0;
+		} else
+		// re con neri vicino
+		if (stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
+			value += 0;
+		} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
+			value += 0;
+		} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
+			value += 0;
+		} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
+			value += 0;
+		} else
+		// controllo cattura re da parte del nero
+		if (this.getPlayer(stato).equalsIgnoreCase("blak")) {
+			if ((stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.BLACK))
+					|| (stato.getBox(i, j + 1).equals(Pawn.BLACK) && stato.getBox(i, j - 1).equals(Pawn.BLACK))) {
+				value += 0.0;
+			}
+		}
+		// tutti gli altri casi
+		else {
+			value += weight;
+		}
+		return value;
+	}
+
+	private double pawnCanBlockEscape(int i, int j, double weight) {
+		if ((i == 1 && j == 6) || (i == 0 && j == 6) || (i == 0 && j == 7) || (i == 1 && j == 7) || (i == 2 && j == 7)
+				|| (i == 1 && j == 8) || (i == 2 && j == 8) || (i == 6 && j == 7) || (i == 6 && j == 8)
+				|| (i == 7 && j == 6) || (i == 7 && j == 7) || (i == 7 && j == 8) || (i == 8 && j == 6)
+				|| (i == 8 && j == 7) || (i == 6 && j == 0) || (i == 6 && j == 1) || (i == 7 && j == 0)
+				|| (i == 7 && j == 1) || (i == 7 && j == 2) || (i == 8 && j == 1) || (i == 8 && j == 2)
+				|| (i == 0 && j == 1) || (i == 1 && j == 1) || (i == 0 && j == 2) || (i == 1 && j == 2)
+				|| (i == 2 && j == 1) || (i == 1 && j == 0) || (i == 2 && j == 0)) {
+			return 0.0;
+		} else {
+			return weight;
+		}
+	}
+
+	private double kingCanEscape(int i, int j, double weight) {
+		System.out.println("CHECK SE IN TRAIETTORIA");
+		int contPawn = 0;
+		for (int row = 0; row < i; row++) {
+			if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
+				contPawn++;
+			}
+		}
+		if (contPawn == 0)
+			return weight;
+		contPawn = 0;
+		for (int row = i + 1; row < 9; row++) {
+			if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
+				contPawn++;
+			}
+		}
+		if (contPawn == 0)
+			return weight;
+		contPawn = 0;
+		for (int column = 0; column < j; column++) {
+			if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
+				contPawn++;
+			}
+		}
+		if (contPawn == 0)
+			return weight;
+		contPawn = 0;
+		for (int column = j + 1; column < 9; column++) {
+			if (b[i][column].equals(Pawn.WHITE) || b[i][column].equals(Pawn.BLACK)) {
+				contPawn++;
+			}
+		}
+		if (contPawn == 0)
+			return weight;
+		return 0.0;
+	}
+
+	private double soldierNearCastle(double weight) {
 		int contCastleWhite = 0;
 		int contCastleBlack = 0;
 		if (b[4][3].equals(Pawn.WHITE)) {
@@ -335,8 +383,10 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (b[5][4].equals(Pawn.BLACK)) {
 			contCastleBlack++;
 		}
-		value += (((contCastleBlack - contCastleWhite * 2) + 8) / 12) * 0.15;
-		// CASO F controllo campi
+		return (((contCastleBlack - contCastleWhite * 2) + 8) / 12) * weight;
+	}
+
+	private double soldierNearCamp(double weight) {
 		int contCampleWhite = 0;
 		int contCampleBlack = 0;
 		if (b[1][3].equals(Pawn.WHITE)) {
@@ -411,14 +461,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (b[5][7].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		value += ((contCampleBlack - contCampleWhite * 2) / 32 + 0.5) * 0.15;
-
-		if (this.getPlayer(stato) == "black")
-			value = 1 - value;
-
-		System.out.println("value: " + value);
-
-		return value;
+		return ((contCampleBlack - contCampleWhite * 2) / 32 + 0.5) * weight;
 	}
 
 	@Override

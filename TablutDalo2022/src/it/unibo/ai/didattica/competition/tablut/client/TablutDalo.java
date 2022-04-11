@@ -13,14 +13,14 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 public class TablutDalo extends TablutClient {
 	public static final String NAME = "Cliente";
-	public static final int DEPTH = 4;
 	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 
+	//timeout= Maximal computation time in seconds.
 	public TablutDalo(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
 		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
-		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, 1.0, timeout - 1);
+		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
 
 	}
 
@@ -30,9 +30,9 @@ public class TablutDalo extends TablutClient {
 		String ipAddress;
 		if (args.length != 3) {
 			System.out.println("Errore args: <role> <timeout> <ipAddress>");
-			System.out.println("Default Setting:\nrole: white\ntimeout=5 sec\nipAddress=\"Localhost\"");
+			System.out.println("Default Setting:\nrole: white\ntimeout=60 sec\nipAddress=\"Localhost\"");
 			role = "white";
-			timeout = 5;
+			timeout = 60;
 			ipAddress = "localhost";
 		} else {
 			role = args[0];
