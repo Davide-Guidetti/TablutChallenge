@@ -14,16 +14,18 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	private boolean DEBUG = false;
 	private Pawn[][] b;
 
-	public static final double soldierNearCastleValue = 0.12; // CASO E
-	public static final double soldierNearCampValue = 0.12; // CASO F
-	public static final double kingUnderAttackValue = 0.22; // CASO G
-	public static final double remainSoldierValue = 0.22; // CASO B
-	public static final double kingCanEscapeValue = 0.22;
-	public static final double pawnCanBlockEscapeValue = 0.02;
+	public static final double soldierNearCastleValue = 0.45; // CASO E
+	public static final double soldierNearCampValue = 0.45; // CASO F
+	public static final double kingUnderAttackValue = 0.6; // CASO G
+	public static final double remainSoldierValue = 0.25; // CASO B
+	public static final double kingCanEscapeValue = 0.6;
+	public static final double pawnCanBlockEscapeValue = 0.1;
+	public static final double kingProtectValue = 0.25;
+	public static final double blackSoldierInAngleValue = 0.1;
 
 	public static double getMaxValueHeuristic() {
 		return soldierNearCastleValue + soldierNearCampValue + kingUnderAttackValue + remainSoldierValue
-				+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16); // 16 numero pedoni neri
+				+ kingCanEscapeValue + kingProtectValue + pawnCanBlockEscapeValue + blackSoldierInAngleValue;
 	}
 
 	public GameDaloTablut(State state, int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
@@ -132,8 +134,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	// HEURISTIC FUNCTION
 	@Override
 	public double getUtility(State stato, String player) {
-		//System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue + kingUnderAttack + remainSoldierValue
-		//		+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
+		// System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue
+		// + kingUnderAttack + remainSoldierValue
+		// + kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
 		// System.out.println("state: " + stato.boardString());
 
 		// check terminal state
@@ -154,6 +157,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 
 		double value = 0;
+		double kingValue = 0;
+		double soldierValue = 0;
 		int contWhiteSoldier = 0;
 		int contBlackSoldier = 0;
 		b = stato.getBoard();
@@ -173,26 +178,34 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 						return this.getPlayer(stato).equalsIgnoreCase("white") ? GameDaloTablut.getMaxValueHeuristic()
 								: 0.0;
 					}
+					// check if king can escape
 					if (!((i >= 3 && i <= 5) || (j >= 3 && j <= 5))) {
-						// check if king can escape
 						value += this.kingCanEscape(i, j, kingCanEscapeValue);
 					}
-					// CASO G
+					// check king under attack
 					value += this.kingUnderAttack(i, j, stato, kingUnderAttackValue);
+					// check soldier protect king
+					value += this.kingProtect(i, j, stato, kingProtectValue);
 				}
-				// conto i pedoni bianchi
+				// cont white soldier
 				if (b[i][j].equals(Pawn.WHITE)) {
 					contWhiteSoldier++;
+					value += pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero di
+																							// pedine
 				}
-				// conto i pedoni neri
+				// cont black soldier
 				if (b[i][j].equals(Pawn.BLACK)) {
 					contBlackSoldier++;
+					// controllo se il pedone nero è in un angolo
+					value += this.blackSoldierInAngle(i, j, blackSoldierInAngleValue);
 					// controllo se il pedone blocca una uscita
-					value += pawnCanBlockEscape(i, j, pawnCanBlockEscapeValue);
+					value += pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero di
+																							// pedine
 				}
 
 			}
 		}
+		// check if king is alive
 		if (!found)
 			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : GameDaloTablut.getMaxValueHeuristic();
 		// CASO B soldati rimanenti
@@ -205,8 +218,50 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (this.getPlayer(stato) == "black")
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
-		System.out.println("value: " + value);
+		System.out.println("value: " + value / this.getMaxValueHeuristic());
 
+		return value;
+	}
+
+	private double blackSoldierInAngle(int i, int j, double weight) {
+		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
+			return 0; //4 angle
+		} else
+			return weight/4;
+	}
+
+	private double kingProtect(int i, int j, State stato, double weight) {
+		double value = 0;
+		// controllo se non ci sono neri vicino al re
+		if (!stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
+			value += weight / 8;
+		} else if (!stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
+			value += weight / 8;
+		} else if (!stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
+			value += weight / 8;
+		} else if (!stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
+			value += weight / 8;
+		} else
+		// controllo se il bianco è di fianco al re
+		if (stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i - 1, j).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i, j + 1).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i, j - 1).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		}
+		// controllo se il bianco sta bloccando un possibile attacco
+		else if (stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK) && stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK) && stato.getBox(i, j - 1).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK) && stato.getBox(i, j + 1).equals(Pawn.WHITE)) {
+			value += weight / 4;
+		}
 		return value;
 	}
 
@@ -305,17 +360,31 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return value;
 	}
 
-	private double pawnCanBlockEscape(int i, int j, double weight) {
-		if ((i == 1 && j == 6) || (i == 0 && j == 6) || (i == 0 && j == 7) || (i == 1 && j == 7) || (i == 2 && j == 7)
-				|| (i == 1 && j == 8) || (i == 2 && j == 8) || (i == 6 && j == 7) || (i == 6 && j == 8)
-				|| (i == 7 && j == 6) || (i == 7 && j == 7) || (i == 7 && j == 8) || (i == 8 && j == 6)
-				|| (i == 8 && j == 7) || (i == 6 && j == 0) || (i == 6 && j == 1) || (i == 7 && j == 0)
-				|| (i == 7 && j == 1) || (i == 7 && j == 2) || (i == 8 && j == 1) || (i == 8 && j == 2)
-				|| (i == 0 && j == 1) || (i == 1 && j == 1) || (i == 0 && j == 2) || (i == 1 && j == 2)
-				|| (i == 2 && j == 1) || (i == 1 && j == 0) || (i == 2 && j == 0)) {
-			return 0.0;
+	private double pawnCanBlockEscape(int i, int j, State stato, double weight) {
+		if (this.getPlayer(stato).equalsIgnoreCase("black")) {
+			if ((i == 1 && j == 6) || (i == 0 && j == 6) || (i == 0 && j == 7) || (i == 1 && j == 7)
+					|| (i == 2 && j == 7) || (i == 1 && j == 8) || (i == 2 && j == 8) || (i == 6 && j == 7)
+					|| (i == 6 && j == 8) || (i == 7 && j == 6) || (i == 7 && j == 7) || (i == 7 && j == 8)
+					|| (i == 8 && j == 6) || (i == 8 && j == 7) || (i == 6 && j == 0) || (i == 6 && j == 1)
+					|| (i == 7 && j == 0) || (i == 7 && j == 1) || (i == 7 && j == 2) || (i == 8 && j == 1)
+					|| (i == 8 && j == 2) || (i == 0 && j == 1) || (i == 1 && j == 1) || (i == 0 && j == 2)
+					|| (i == 1 && j == 2) || (i == 2 && j == 1) || (i == 1 && j == 0) || (i == 2 && j == 0)) {
+				return weight;
+			} else {
+				return 0.0;
+			}
 		} else {
-			return weight;
+			if (!(i == 1 && j == 6) && !(i == 0 && j == 6) && !(i == 0 && j == 7) && !(i == 1 && j == 7)
+					&& !(i == 2 && j == 7) && !(i == 1 && j == 8) && !(i == 2 && j == 8) && !(i == 6 && j == 7)
+					&& !(i == 6 && j == 8) && !(i == 7 && j == 6) && !(i == 7 && j == 7) && !(i == 7 && j == 8)
+					&& !(i == 8 && j == 6) && !(i == 8 && j == 7) && !(i == 6 && j == 0) && !(i == 6 && j == 1)
+					&& !(i == 7 && j == 0) && !(i == 7 && j == 1) && !(i == 7 && j == 2) && !(i == 8 && j == 1)
+					&& !(i == 8 && j == 2) && !(i == 0 && j == 1) && !(i == 1 && j == 1) && !(i == 0 && j == 2)
+					&& !(i == 1 && j == 2) && !(i == 2 && j == 1) && !(i == 1 && j == 0) && !(i == 2 && j == 0)) {
+				return weight;
+			} else {
+				return 0.0;
+			}
 		}
 	}
 
