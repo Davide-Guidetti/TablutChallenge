@@ -18,7 +18,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	public static final double soldierNearCampValue = 0.5; // CASO F
 	public static final double kingUnderAttackValue = 0.6; // CASO G
 	public static final double remainSoldierValue = 0.3; // CASO B
-	public static final double kingCanEscapeValue = 0.6;
+	public static final double kingCanEscapeValue = 0.8;
 	public static final double pawnCanBlockEscapeValue = 0.15;
 	public static final double kingProtectValue = 0.4;
 	public static final double blackSoldierInAngleValue = 0.1;
@@ -197,8 +197,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					// controllo se il pedone nero è in un angolo
 					value += this.blackSoldierInAngle(i, j, blackSoldierInAngleValue);
 					// controllo se il pedone blocca una uscita
-					value += pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero di
-																							// pedine
+					value += this.pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero
+																									// di pedine
 				}
 
 			}
@@ -216,14 +216,14 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (this.getPlayer(stato).equalsIgnoreCase("black"))
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
-		System.out.println("value: " + value / this.getMaxValueHeuristic());
+		System.out.println("value: " + value / GameDaloTablut.getMaxValueHeuristic());
 
 		return value;
 	}
 
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0.0; //controlla perché cosi non ci vanno
+			return 0.0; // controlla perché cosi non ci vanno
 		} else
 			return weight / 4; // 4 angle
 	}
