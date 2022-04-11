@@ -16,13 +16,13 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	public static final double soldierNearCastleValue = 0.12; // CASO E
 	public static final double soldierNearCampValue = 0.12; // CASO F
-	public static final double checkPositionKing = 0.22; // CASO G
+	public static final double kingUnderAttackValue = 0.22; // CASO G
 	public static final double remainSoldierValue = 0.22; // CASO B
 	public static final double kingCanEscapeValue = 0.22;
 	public static final double pawnCanBlockEscapeValue = 0.02;
 
 	public static double getMaxValueHeuristic() {
-		return soldierNearCastleValue + soldierNearCampValue + checkPositionKing + remainSoldierValue
+		return soldierNearCastleValue + soldierNearCampValue + kingUnderAttackValue + remainSoldierValue
 				+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16); // 16 numero pedoni neri
 	}
 
@@ -132,7 +132,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	// HEURISTIC FUNCTION
 	@Override
 	public double getUtility(State stato, String player) {
-		//System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue + checkPositionKing + remainSoldierValue
+		//System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue + kingUnderAttack + remainSoldierValue
 		//		+ kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
 		// System.out.println("state: " + stato.boardString());
 
@@ -178,7 +178,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 						value += this.kingCanEscape(i, j, kingCanEscapeValue);
 					}
 					// CASO G
-					value += this.checkPositionKing(i, j, stato, checkPositionKing);
+					value += this.kingUnderAttack(i, j, stato, kingUnderAttackValue);
 				}
 				// conto i pedoni bianchi
 				if (b[i][j].equals(Pawn.WHITE)) {
@@ -210,7 +210,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return value;
 	}
 
-	private double checkPositionKing(int i, int j, State stato, double weight) {
+	private double kingUnderAttack(int i, int j, State stato, double weight) {
 		// re nel castello
 		int soldierBlack = 0;
 		double value = 0;
