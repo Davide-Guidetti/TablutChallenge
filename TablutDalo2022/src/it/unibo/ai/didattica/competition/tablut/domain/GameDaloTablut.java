@@ -14,13 +14,13 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	private boolean DEBUG = false;
 	private Pawn[][] b;
 
-	public static final double soldierNearCastleValue = 0.45; // CASO E
-	public static final double soldierNearCampValue = 0.45; // CASO F
+	public static final double soldierNearCastleValue = 0.4; // CASO E
+	public static final double soldierNearCampValue = 0.5; // CASO F
 	public static final double kingUnderAttackValue = 0.6; // CASO G
-	public static final double remainSoldierValue = 0.25; // CASO B
+	public static final double remainSoldierValue = 0.3; // CASO B
 	public static final double kingCanEscapeValue = 0.6;
-	public static final double pawnCanBlockEscapeValue = 0.1;
-	public static final double kingProtectValue = 0.25;
+	public static final double pawnCanBlockEscapeValue = 0.15;
+	public static final double kingProtectValue = 0.4;
 	public static final double blackSoldierInAngleValue = 0.1;
 
 	public static double getMaxValueHeuristic() {
@@ -157,8 +157,6 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 
 		double value = 0;
-		double kingValue = 0;
-		double soldierValue = 0;
 		int contWhiteSoldier = 0;
 		int contBlackSoldier = 0;
 		b = stato.getBoard();
@@ -215,7 +213,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		// CASO F controllo campi
 		value += this.soldierNearCamp(soldierNearCampValue);
 
-		if (this.getPlayer(stato) == "black")
+		if (this.getPlayer(stato).equalsIgnoreCase("black"))
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
 		System.out.println("value: " + value / this.getMaxValueHeuristic());
@@ -225,9 +223,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0; //4 angle
+			return 0.0; //controlla perché cosi non ci vanno
 		} else
-			return weight/4;
+			return weight / 4; // 4 angle
 	}
 
 	private double kingProtect(int i, int j, State stato, double weight) {
@@ -369,9 +367,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					|| (i == 7 && j == 0) || (i == 7 && j == 1) || (i == 7 && j == 2) || (i == 8 && j == 1)
 					|| (i == 8 && j == 2) || (i == 0 && j == 1) || (i == 1 && j == 1) || (i == 0 && j == 2)
 					|| (i == 1 && j == 2) || (i == 2 && j == 1) || (i == 1 && j == 0) || (i == 2 && j == 0)) {
-				return weight;
-			} else {
 				return 0.0;
+			} else {
+				return weight;
 			}
 		} else {
 			if (!(i == 1 && j == 6) && !(i == 0 && j == 6) && !(i == 0 && j == 7) && !(i == 1 && j == 7)
