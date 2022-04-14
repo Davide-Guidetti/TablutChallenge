@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.FileHandler;
@@ -49,8 +50,9 @@ public class GameAshtonTablut implements Game {
 	private File gameLog;
 	private FileHandler fh;
 	protected Logger loggGame;
-	protected List<String> citadels;
-	// private List<String> strangeCitadels;
+	protected static List<String> citadels = new ArrayList<String>(Arrays.asList(
+		"a4","a5","a6","b5","d1","e1","f1","e2","i4","i5","i6","h5","d9","e9","f9","e8"
+	));
 	protected List<State> drawConditions;
 
 	public GameAshtonTablut(int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
@@ -92,28 +94,6 @@ public class GameAshtonTablut implements Game {
 		loggGame.fine("Inizio partita");
 		loggGame.fine("Stato:\n" + state.toString());
 		drawConditions = new ArrayList<>();
-		this.citadels = new ArrayList<>();
-		// this.strangeCitadels = new ArrayList<String>();
-		this.citadels.add("a4");
-		this.citadels.add("a5");
-		this.citadels.add("a6");
-		this.citadels.add("b5");
-		this.citadels.add("d1");
-		this.citadels.add("e1");
-		this.citadels.add("f1");
-		this.citadels.add("e2");
-		this.citadels.add("i4");
-		this.citadels.add("i5");
-		this.citadels.add("i6");
-		this.citadels.add("h5");
-		this.citadels.add("d9");
-		this.citadels.add("e9");
-		this.citadels.add("f9");
-		this.citadels.add("e8");
-		// this.strangeCitadels.add("e1");
-		// this.strangeCitadels.add("a5");
-		// this.strangeCitadels.add("i5");
-		// this.strangeCitadels.add("e9");
 	}
 
 	@Override

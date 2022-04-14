@@ -202,7 +202,7 @@ public abstract class State {
 		return result;
 	}
 
-	public String getBox(int row, int column) {
+	public static String getBox(int row, int column) {
 		String ret;
 		char col = (char) (column + 97);
 		ret = col + "" + (row + 1);
