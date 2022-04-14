@@ -172,7 +172,7 @@ class TestAlgorithm {
 			}
 
 			private void checkUtilityInRange(double utility) {
-				if(utility < 0 && utility > GameDaloTablut.getMaxValueHeuristic()) {
+				if(utility < 0 || utility > GameDaloTablut.getMaxValueHeuristic()) {
 					fail("Utility out of range: utility=" + utility + " out of range [" + 0.0 + "," + GameDaloTablut.getMaxValueHeuristic() + "]");
 				}				
 			}
