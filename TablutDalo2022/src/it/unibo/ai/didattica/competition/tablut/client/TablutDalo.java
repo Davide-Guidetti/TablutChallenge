@@ -20,7 +20,8 @@ public class TablutDalo extends TablutClient {
 	public TablutDalo(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
-		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
+		
+		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black",this.getPlayer());
 		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
 
 	}
@@ -33,7 +34,7 @@ public class TablutDalo extends TablutClient {
 			System.out.println("Errore args: <role> <timeout> <ipAddress>");
 			System.out.println("Default Setting:\nrole: white\ntimeout=60 sec\nipAddress=\"Localhost\"");
 			role = "white";
-			timeout = 60;
+			timeout = 5;
 			ipAddress = "localhost";
 		} else {
 			role = args[0];

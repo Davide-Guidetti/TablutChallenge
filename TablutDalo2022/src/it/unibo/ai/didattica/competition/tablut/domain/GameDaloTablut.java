@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import aima.core.search.adversarial.Game;
+import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
+import it.unibo.ai.didattica.competition.tablut.client.TablutDalo;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
@@ -13,11 +15,12 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	private static final String[] PLAYERS = { "white", "black" };
 	private boolean DEBUG = false;
 	private Pawn[][] b;
+	private State.Turn player;
 
 	public static final double soldierNearCastleValue = 0.4; // CASO E
 	public static final double soldierNearCampValue = 0.5; // CASO F
 	public static final double kingUnderAttackValue = 0.8; // CASO G
-	public static final double remainSoldierValue = 0.3; // CASO B
+	public static final double remainSoldierValue = 0.6; // CASO B
 	public static final double kingCanEscapeValue = 0.8;
 	public static final double pawnCanBlockEscapeValue = 0.15;
 	public static final double kingProtectValue = 0.4;
@@ -29,8 +32,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	}
 
 	public GameDaloTablut(State state, int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
-			String blackName) {
+			String blackName, State.Turn player) {
 		super(state, repeated_moves_allowed, cache_size, logs_folder, whiteName, blackName);
+		this.player = player;
 	}
 
 	@Override
@@ -107,33 +111,33 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		state.getDrawConditions().add(state.clone());
 
-		//this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
+		// this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
 
-		//this.loggGame.fine("Stato:\n" + state.toString());
-		//System.out.println("Stato:\n" + state.toString());
+		// this.loggGame.fine("Stato:\n" + state.toString());
+		// System.out.println("Stato:\n" + state.toString());
 
 		return state;
 	}
 
 	// HEURISTIC FUNCTION
 	@Override
-	public double getUtility(State stato, String player) {
+	public double getUtility(State stato, String playerCurrent) {
 		// System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue
 		// + kingUnderAttack + remainSoldierValue
 		// + kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
 		// System.out.println("state: " + stato.boardString());
 
 		// check terminal state
-		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("white")) {
+		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equals(Turn.WHITE)) {
 			return GameDaloTablut.getMaxValueHeuristic();
 		}
-		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equalsIgnoreCase("black")) {
+		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equals(Turn.BLACK)) {
 			return 0.0;
 		}
-		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equalsIgnoreCase("black")) {
+		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equals(Turn.BLACK)) {
 			return GameDaloTablut.getMaxValueHeuristic();
 		}
-		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equalsIgnoreCase("white")) {
+		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equals(Turn.WHITE)) {
 			return 0;
 		}
 		if (stato.getTurn().equals(Turn.DRAW)) {
@@ -157,8 +161,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 							|| (i == 8 && (j == 2 || j == 3 || j == 6 || j == 7))
 							|| (j == 0 && (i == 2 || i == 3 || i == 6 || i == 7))
 							|| (j == 8 && (i == 2 || i == 3 || i == 6 || i == 7))) {
-						return this.getPlayer(stato).equalsIgnoreCase("white") ? GameDaloTablut.getMaxValueHeuristic()
-								: 0.0;
+						return player.equals(Turn.WHITE) ? GameDaloTablut.getMaxValueHeuristic() : 0.0;
 					}
 					// check if king can escape
 					if (!((i >= 3 && i <= 5) || (j >= 3 && j <= 5))) {
@@ -189,7 +192,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		// check if king is alive
 		if (!found)
-			return this.getPlayer(stato).equalsIgnoreCase("white") ? 0.0 : GameDaloTablut.getMaxValueHeuristic();
+			return player.equals(Turn.WHITE) ? 0.0 : GameDaloTablut.getMaxValueHeuristic();
 		// CASO B soldati rimanenti
 		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * remainSoldierValue;
 		// CASO E controllo castello
@@ -197,7 +200,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		// CASO F controllo campi
 		value += this.soldierNearCamp(soldierNearCampValue);
 
-		if (this.getPlayer(stato).equalsIgnoreCase("black"))
+		// if (this.getPlayer(stato).equalsIgnoreCase("black"))
+		if (player.equals(Turn.BLACK))
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
 		System.out.println("value: " + value / GameDaloTablut.getMaxValueHeuristic());
@@ -207,9 +211,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0.0; 
+			return  weight / 4; // 4 angle
 		} else
-			return weight / 4; // 4 angle
+			return 0.0;
 	}
 
 	private double kingProtect(int i, int j, State stato, double weight) {

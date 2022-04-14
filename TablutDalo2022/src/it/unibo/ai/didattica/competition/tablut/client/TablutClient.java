@@ -23,7 +23,7 @@ import it.unibo.ai.didattica.competition.tablut.util.StreamUtils;
  */
 public abstract class TablutClient implements Runnable {
 
-	private State.Turn player;
+	protected State.Turn player;
 	private String name;
 	private Socket playerSocket;
 	private DataInputStream in;
