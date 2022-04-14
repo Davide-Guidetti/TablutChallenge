@@ -22,7 +22,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	public static final double kingUnderAttackValue = 0.8; // CASO G
 	public static final double remainSoldierValue = 2.0; // CASO B
 	public static final double kingCanEscapeValue = 0.8;
-	public static final double pawnCanBlockEscapeValue = 0.15;
+	public static final double pawnCanBlockEscapeValue = 0.1;
 	public static final double kingProtectValue = 0.3;
 	public static final double blackSoldierInAngleValue = 0.1;
 	public static final double eatValue = 1;
