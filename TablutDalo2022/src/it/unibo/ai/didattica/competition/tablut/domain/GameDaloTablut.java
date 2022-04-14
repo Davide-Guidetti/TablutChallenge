@@ -208,7 +208,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (player.equals(Turn.BLACK))
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
-		System.out.println("value: " + value / GameDaloTablut.getMaxValueHeuristic());
+		//System.out.println("value: " + value / GameDaloTablut.getMaxValueHeuristic());
 
 		return value;
 	}
@@ -459,7 +459,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	}
 
 	private double kingCanEscape(int i, int j, double weight) {
-		System.out.println("CHECK SE IN TRAIETTORIA");
+		//System.out.println("CHECK SE IN TRAIETTORIA");
 		int contPawn = 0;
 		for (int row = 0; row < i; row++) {
 			if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {

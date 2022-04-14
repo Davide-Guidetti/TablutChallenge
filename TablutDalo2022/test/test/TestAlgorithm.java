@@ -79,7 +79,7 @@ class TestAlgorithm {
 		state.setBoard(board);
 		
 		constructObjects();
-		//searchStrategy.MaxExpansionLevel = 1;
+		searchStrategy.maxDepth = 1;
 		
 		System.out.println("finding action for state");
 		System.out.println(state.boardString());
@@ -97,75 +97,10 @@ class TestAlgorithm {
 
 	private void constructObjects() {
 		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
-		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
-			
-			protected boolean logEnabled = true;
-			protected boolean heuristicEvaluationUsed;
-			
-			public int MaxExpansionLevel = 1;
-
-			class ActionStore<ACTION> {
-				private List<ACTION> actions = new ArrayList<ACTION>();
-				private List<Double> utilValues = new ArrayList<Double>();
-
-				void add(ACTION action, double utilValue) {
-					int idx;
-					for (idx = 0; idx < actions.size() && utilValue <= utilValues.get(idx); idx++)
-						;
-					actions.add(idx, action);
-					utilValues.add(idx, utilValue);
-				}
-
-				int size() {
-					return actions.size();
-				}
-			}
+		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
 			
 			@Override
-			public Action makeDecision(State state) {
-				StringBuffer logText = null;
-				String player = game.getPlayer(state);
-				List<Action> results = orderActions(state, game.getActions(state), player, 0);
-				currDepthLimit = 0;
-				do {
-					incrementDepthLimit();
-					if (logEnabled) logText = new StringBuffer("depth " + currDepthLimit + ": ");
-					heuristicEvaluationUsed = false;
-					ActionStore<Action> newResults = new ActionStore<Action>();
-					logText.append("Evluating up to depth " + currDepthLimit + "... \n");
-					for (Action action : results) {
-						double value = minValue(
-								logExpansion(
-										game.getResult(state, action), 
-										action,
-										player,
-										logText
-								),
-								player, 
-								Double.NEGATIVE_INFINITY, 
-								Double.POSITIVE_INFINITY, 
-								1
-						);
-						/*if (timer.timeOutOccured())
-							break; // exit from action loop*/
-						newResults.add(action, value);
-						if (logEnabled)
-							logText.append("value for top level action " + action + " = " + value + " \n");
-					}
-					if (newResults.size() > 0) {
-						results = newResults.actions;
-						logText.append("Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0) + " (max possible value: " + GameDaloTablut.getMaxValueHeuristic() + ")\n");
-					}else {
-						//TODO
-						logText.append("No action to chose from");
-					}
-					if (logEnabled) System.out.println(logText);
-				} while (/*!timer.timeOutOccured() && */ heuristicEvaluationUsed && currDepthLimit<MaxExpansionLevel);
-				
-				return results.get(0);
-			}
-			
-			private State logExpansion(State state, Action action, String player, StringBuffer logText) {
+			protected State logExpansion(State state, Action action, String player, StringBuffer logText) {
 				logText.append("\n");
 				logText.append("Evaluation for action: \"" + action+"\"\n");
 				logText.append(state.boardStringWithCellIndex());
@@ -181,6 +116,9 @@ class TestAlgorithm {
 				}				
 			}
 		};
+		
+		searchStrategy.printStatistics = true;
+		searchStrategy.logEnabled = true;
 	}
 
 }
