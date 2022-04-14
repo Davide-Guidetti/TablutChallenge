@@ -20,15 +20,16 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	public static final double soldierNearCastleValue = 0.4; // CASO E
 	public static final double soldierNearCampValue = 0.5; // CASO F
 	public static final double kingUnderAttackValue = 0.8; // CASO G
-	public static final double remainSoldierValue = 0.6; // CASO B
+	public static final double remainSoldierValue = 2.0; // CASO B
 	public static final double kingCanEscapeValue = 0.8;
-	public static final double pawnCanBlockEscapeValue = 0.15;
-	public static final double kingProtectValue = 0.4;
+	public static final double pawnCanBlockEscapeValue = 0.1;
+	public static final double kingProtectValue = 0.3;
 	public static final double blackSoldierInAngleValue = 0.1;
+	public static final double eatValue = 1;
 
 	public static double getMaxValueHeuristic() {
 		return soldierNearCastleValue + soldierNearCampValue + kingUnderAttackValue + remainSoldierValue
-				+ kingCanEscapeValue + kingProtectValue + pawnCanBlockEscapeValue + blackSoldierInAngleValue;
+				+ kingCanEscapeValue + kingProtectValue + pawnCanBlockEscapeValue + blackSoldierInAngleValue + eatValue;
 	}
 
 	public GameDaloTablut(State state, int repeated_moves_allowed, int cache_size, String logs_folder, String whiteName,
@@ -153,14 +154,13 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		for (int i = 0; i < stato.getBoard().length; i++) {
 			for (int j = 0; j < stato.getBoard().length; j++) {
 				// CASO A
-				// calcolo distanza re da piastrelle di salvezza
 				if (b[i][j].equals(Pawn.KING)) {
 					found = true;
 					// re in escape box
-					if ((i == 0 && (j == 2 || j == 3 || j == 6 || j == 7))
-							|| (i == 8 && (j == 2 || j == 3 || j == 6 || j == 7))
-							|| (j == 0 && (i == 2 || i == 3 || i == 6 || i == 7))
-							|| (j == 8 && (i == 2 || i == 3 || i == 6 || i == 7))) {
+					if ((i == 0 && (j == 1 || j == 2 || j == 6 || j == 7))
+							|| (i == 8 && (j == 1 || j == 2 || j == 6 || j == 7))
+							|| (j == 0 && (i == 1 || i == 2 || i == 6 || i == 7))
+							|| (j == 8 && (i == 1 || i == 2 || i == 6 || i == 7))) {
 						return player.equals(Turn.WHITE) ? GameDaloTablut.getMaxValueHeuristic() : 0.0;
 					}
 					// check if king can escape
@@ -181,12 +181,14 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				// cont black soldier
 				if (b[i][j].equals(Pawn.BLACK)) {
 					contBlackSoldier++;
-					// controllo se il pedone nero � in un angolo
+					// controllo se il pedone nero in un angolo
 					value += this.blackSoldierInAngle(i, j, blackSoldierInAngleValue);
 					// controllo se il pedone blocca una uscita
 					value += this.pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero
 																									// di pedine
+
 				}
+				value += canEat(i, j, eatValue / 25); // tutti i pezzi nel tabellone
 
 			}
 		}
@@ -209,9 +211,80 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return value;
 	}
 
+	private double canEat(int i, int j, double eatValue) {
+		double value = 0;
+		eatValue = eatValue / 4;
+		// eat right
+		if (i + 2 < 9 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i + 1][j].equals(Pawn.BLACK)
+				&& ((b[i + 2][j].equals(Pawn.WHITE) || b[i + 2][j].equals(Pawn.KING)) || this.isCampo(i + 2, j)
+						|| (i + 2 == 4 && j == 4))) {
+			value += eatValue;
+		} else {
+			value += eatValue / 2;
+		}
+		if (i + 2 < 9 && b[i][j].equals(Pawn.BLACK) && b[i + 1][j].equals(Pawn.WHITE)
+				&& (b[i + 2][j].equals(Pawn.BLACK) || this.isCampo(i + 2, j) || (i + 2 == 4 && j == 4))) {
+			value += 0.0;
+		} else {
+			value += eatValue / 2;
+		}
+		// eat left
+		if (i - 2 >= 0 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i - 1][j].equals(Pawn.BLACK)
+				&& ((b[i - 2][j].equals(Pawn.WHITE) || b[i - 2][j].equals(Pawn.KING)) || this.isCampo(i - 2, j)
+						|| (i + 2 == 4 && j == 4))) {
+			value += eatValue;
+		} else {
+			value += eatValue / 2;
+		}
+		if (i - 2 >= 0 && b[i][j].equals(Pawn.BLACK) && b[i - 1][j].equals(Pawn.WHITE)
+				&& (b[i - 2][j].equals(Pawn.BLACK) || this.isCampo(i - 2, j) || (i + 2 == 4 && j == 4))) {
+			value += 0.0;
+		} else {
+			value += eatValue / 2;
+		}
+		// eat top
+		if (j + 2 < 9 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[1][j + 1].equals(Pawn.BLACK)
+				&& ((b[2][j + 2].equals(Pawn.WHITE) || b[i][j + 2].equals(Pawn.KING)) || this.isCampo(i, j + 2)
+						|| (i == 4 && j + 2 == 4))) {
+			value += eatValue;
+		} else {
+			value += eatValue / 2;
+		}
+		if (j + 2 < 9 && b[i][j].equals(Pawn.BLACK) && b[1][j + 1].equals(Pawn.WHITE)
+				&& (b[2][j + 2].equals(Pawn.BLACK) || this.isCampo(i, j + 2) || (i == 4 && j + 2 == 4))) {
+			value += 0.0;
+		} else {
+			value += eatValue / 2;
+		}
+		// eat bottom
+		if (j - 2 >= 0 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i][j - 1].equals(Pawn.BLACK)
+				&& ((b[i][j - 2].equals(Pawn.WHITE) || b[i][j - 2].equals(Pawn.KING)) || this.isCampo(i, j - 2)
+						|| (j + 2 == 4 && i == 4))) {
+			value += eatValue;
+		} else {
+			value += eatValue / 2;
+		}
+		if (j - 2 >= 0 && b[i][j].equals(Pawn.BLACK) && b[i][j - 1].equals(Pawn.WHITE)
+				&& (b[i][j - 2].equals(Pawn.BLACK) || this.isCampo(i, j - 2) || (j + 2 == 4 && i == 4))) {
+			value += 0.0;
+		} else {
+			value += eatValue / 2;
+		}
+		return value;
+	}
+
+	private boolean isCampo(int i, int j) {
+		if ((i == 0 && (j == 3 || j == 4 || j == 5)) || (i == 1 && j == 4) || (i == 8 && (j == 3 || j == 4 || j == 5))
+				|| (i == 7 && j == 4) || (j == 0 && (i == 3 || i == 4 || i == 5)) || (j == 1 && i == 4)
+				|| (j == 8 && (i == 3 || i == 4 || i == 5)) || (j == 7 && i == 4)) {
+			return true;
+		} else
+			return false;
+	}
+
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return  weight / 4; // 4 angle
+			return weight / 4; // 4 angle
 		} else
 			return 0.0;
 	}
@@ -219,33 +292,33 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	private double kingProtect(int i, int j, State stato, double weight) {
 		double value = 0;
 		// controllo se non ci sono neri vicino al re
-		if (!stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
+		if (!b[i + 1][ j].equals(Pawn.BLACK)) {
 			value += weight / 8;
-		} else if (!stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
+		} else if (!b[i - 1][ j].equals(Pawn.BLACK)) {
 			value += weight / 8;
-		} else if (!stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
+		} else if (!b[i][ j + 1].equals(Pawn.BLACK)) {
 			value += weight / 8;
-		} else if (!stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
+		} else if (!b[i][ j - 1].equals(Pawn.BLACK)) {
 			value += weight / 8;
 		} else
 		// controllo se il bianco di fianco al re
-		if (stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
+		if (b[i + 1][ j].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i - 1, j).equals(Pawn.WHITE)) {
+		} else if (b[i - 1][ j].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i, j + 1).equals(Pawn.WHITE)) {
+		} else if (b[i][ j + 1].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i, j - 1).equals(Pawn.WHITE)) {
+		} else if (b[i][ j - 1].equals(Pawn.WHITE)) {
 			value += weight / 4;
 		}
 		// controllo se il bianco sta bloccando un possibile attacco
-		else if (stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.WHITE)) {
+		else if (b[i + 1][ j].equals(Pawn.BLACK) && b[i - 1][ j].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK) && stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
+		} else if (b[i - 1][j].equals(Pawn.BLACK) && b[i + 1][j].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK) && stato.getBox(i, j - 1).equals(Pawn.WHITE)) {
+		} else if (b[i][ j + 1].equals(Pawn.BLACK) && b[i][ j - 1].equals(Pawn.WHITE)) {
 			value += weight / 4;
-		} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK) && stato.getBox(i, j + 1).equals(Pawn.WHITE)) {
+		} else if (b[i][ j - 1].equals(Pawn.BLACK) && b[i][ j + 1].equals(Pawn.WHITE)) {
 			value += weight / 4;
 		}
 		return value;
@@ -323,19 +396,19 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 			value += 0;
 		} else
 		// re con neri vicino
-		if (stato.getBox(i + 1, j).equals(Pawn.BLACK)) {
+		if (b[i + 1][j].equals(Pawn.BLACK)) {
 			value += 0;
-		} else if (stato.getBox(i - 1, j).equals(Pawn.BLACK)) {
+		} else if (b[i - 1][j].equals(Pawn.BLACK)) {
 			value += 0;
-		} else if (stato.getBox(i, j + 1).equals(Pawn.BLACK)) {
+		} else if (b[i][j + 1].equals(Pawn.BLACK)) {
 			value += 0;
-		} else if (stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
+		} else if (b[i][j - 1].equals(Pawn.BLACK)) {
 			value += 0;
 		} else
 		// controllo cattura re da parte del nero
 		if (this.getPlayer(stato).equalsIgnoreCase("blak")) {
-			if ((stato.getBox(i + 1, j).equals(Pawn.BLACK) && stato.getBox(i - 1, j).equals(Pawn.BLACK))
-					|| (stato.getBox(i, j + 1).equals(Pawn.BLACK) && stato.getBox(i, j - 1).equals(Pawn.BLACK))) {
+			if ((b[i + 1][j].equals(Pawn.BLACK) && b[i - 1][j].equals(Pawn.BLACK))
+					|| (b[i][j + 1].equals(Pawn.BLACK) && b[i][j - 1].equals(Pawn.BLACK))) {
 				value += 0.0;
 			}
 		}
