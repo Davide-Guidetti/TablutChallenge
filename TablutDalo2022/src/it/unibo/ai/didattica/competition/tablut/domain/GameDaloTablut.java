@@ -131,16 +131,16 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		// System.out.println("state: " + stato.boardString());
 
 		// check terminal state
-		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equals(Turn.WHITE)) {
+		if (stato.getTurn().equals(Turn.WHITEWIN) && playerCurrent.equalsIgnoreCase(Turn.WHITE.name())) {
 			return GameDaloTablut.getMaxValueHeuristic();
 		}
-		if (stato.getTurn().equals(Turn.WHITEWIN) && player.equals(Turn.BLACK)) {
+		if (stato.getTurn().equals(Turn.WHITEWIN) && playerCurrent.equalsIgnoreCase(Turn.BLACK.name())) {
 			return 0.0;
 		}
-		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equals(Turn.BLACK)) {
+		if (stato.getTurn().equals(Turn.BLACKWIN) && playerCurrent.equalsIgnoreCase(Turn.BLACK.name())) {
 			return GameDaloTablut.getMaxValueHeuristic();
 		}
-		if (stato.getTurn().equals(Turn.BLACKWIN) && player.equals(Turn.WHITE)) {
+		if (stato.getTurn().equals(Turn.BLACKWIN) && playerCurrent.equalsIgnoreCase(Turn.WHITE.name())) {
 			return 0;
 		}
 		if (stato.getTurn().equals(Turn.DRAW)) {
@@ -215,7 +215,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	private double canEat(int i, int j, double eatValue) {
 		double value = 0;
-		eatValue = eatValue / 4;
+		//System.out.println("EATVALUE: " + eatValue);
+		eatValue = eatValue / 6;
 		// eat right
 		if (i + 2 < 9 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i + 1][j].equals(Pawn.BLACK)
 				&& ((b[i + 2][j].equals(Pawn.WHITE) || b[i + 2][j].equals(Pawn.KING)) || this.isCampo(i + 2, j)
@@ -272,6 +273,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		} else {
 			value += eatValue / 2;
 		}
+		//System.out.println("EATVALUE VALUE: " + value);
 		return value;
 	}
 
