@@ -23,70 +23,43 @@ class TestAlgorithm {
 	Game<State, Action, String> rules;
 	IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 	
-
 	@Test
-	void testStateExpansion() {
-		State state = new StateTablut();
+	void testKingEscape() {
+		//king has a clear path for white victory
+//		  ABCDEFGHI
+//		 1OOOBBBOOO
+//		 2OOOOBOOOO
+//		 3OOOOWOOOO
+//		 4BOOOWOOOB
+//		 5BBKWTWWBB
+//		 6BOWOWOOOB
+//		 7OOOOWOOOO
+//		 8OOOOBOOOO
+//		 9OOOBBBOOO
 		
 		Turn currentTurn = Turn.WHITE;
+		
+		State state = new StateTablut();
 		state.setTurn(currentTurn);
 		
-		
-		Pawn [][] board = new Pawn[9][9];
-		
-		for (int i = 0; i < 9; i++) {
-			for (int j = 0; j < 9; j++) {
-				board[i][j] = Pawn.EMPTY;
-			}
-		}
-
-		board[4][4] = Pawn.THRONE;
-		board[4][4] = Pawn.KING;
-
-		board[2][4] = Pawn.WHITE;
-		board[3][4] = Pawn.WHITE;
-		board[5][4] = Pawn.WHITE;
-		board[6][4] = Pawn.WHITE;
-		board[4][2] = Pawn.WHITE;
-		board[4][2] = Pawn.KING;
-		board[4][3] = Pawn.WHITE;
-		board[4][5] = Pawn.WHITE;
-		board[4][6] = Pawn.WHITE;
-
-		board[0][3] = Pawn.BLACK;
-		board[0][4] = Pawn.BLACK;
-		board[0][5] = Pawn.BLACK;
-		board[1][4] = Pawn.BLACK;
-		board[8][3] = Pawn.BLACK;
-		board[8][4] = Pawn.BLACK;
-		board[8][5] = Pawn.BLACK;
-		board[7][4] = Pawn.BLACK;
-		board[3][0] = Pawn.BLACK;
-		board[4][0] = Pawn.BLACK;
-		board[5][0] = Pawn.BLACK;
-		board[4][1] = Pawn.BLACK;
-		board[3][8] = Pawn.BLACK;
-		board[4][8] = Pawn.BLACK;
-		board[5][8] = Pawn.BLACK;
-		board[4][7] = Pawn.BLACK;
-		
-		
+		Pawn [][] board = state.getBoard();
+		// ---------- START PLACING PAWNS ----------
 		//put the king in a position in which he could escape
 		board[4][4] = Pawn.THRONE; //replace king
 		board[4][2] = Pawn.KING;
-		board[5][2] = Pawn.WHITE;// put a soldire so that the kink have only one way to escape
-		
+		board[5][2] = Pawn.WHITE;// put a soldier so that the king have only one way to escape
+		// ----------- PLACEMENT DONE --------------
 		state.setBoard(board);
 		
 		constructObjects();
 		searchStrategy.maxDepth = 1;
 		
 		System.out.println("finding action for state");
-		System.out.println(state.boardString());
+		System.out.println(state.boardStringWithCellIndex());
 		System.out.println();
 		
+		//EXPECTED BEHAVIOUR: king escapes going from 4,2 to 0,2
 		Action chosenAction = searchStrategy.makeDecision(state);
-		
 		try {
 			assertEquals(new Action(4,2,0,2,currentTurn), chosenAction);
 		} catch (IOException e) {
@@ -94,7 +67,67 @@ class TestAlgorithm {
 			fail();
 		}
 	}
+	
+	@Test
+	void testEatKing() {
+		//blacks have a save victory
+//		  ABCDEFGHI
+//		 1OOOBBBOOO
+//		 2OOOOBOOOO
+//		 3OOOOWOOOO
+//		 4BOOOWOOOB
+//		 5BBWWTKBOB
+//		 6BOOOWBOOB
+//		 7OOOOWOOOO
+//		 8OOOOBOOOO
+//		 9OOOBBOOOO
+		
+		Turn currentTurn = Turn.BLACK;
+		
+		State state = new StateTablut();
+		state.setTurn(currentTurn);
+		
+		Pawn [][] board = state.getBoard();
+		// ---------- START PLACING PAWNS ----------
+		//put the king in a position in which he could escape
+		board[4][4] = Pawn.THRONE; //replace king
+		board[4][5] = Pawn.KING;  //king adjacent to castle
+		//get 2 blask out of camps, and place them around the king
+		board[8][5] = Pawn.EMPTY;
+		board[5][5] = Pawn.BLACK;
+		board[4][7] = Pawn.EMPTY;
+		board[4][6] = Pawn.BLACK;
+		// ----------- PLACEMENT DONE --------------
+		state.setBoard(board);
+		
+		constructObjects();
+		searchStrategy.maxDepth = 1;
+		
+		System.out.println("finding action for state");
+		System.out.println(state.boardStringWithCellIndex());
+		System.out.println();
+		
+		Action chosenAction = searchStrategy.makeDecision(state);
+		
+		//EXPECTED BEHAVIOUR: black from 0,5 eats king gointo to 3,5
+		try {
+			assertEquals(new Action(0,5,3,5,currentTurn), chosenAction);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	private void constructObjects() {
 		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
 		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
