@@ -1,6 +1,8 @@
 package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -13,7 +15,9 @@ import java.io.Serializable;
 public class StateTablut extends State implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
+	protected List<State> drawConditions = new ArrayList<>();
+	protected int movesWithutCapturing = 0;
+	
 	public StateTablut() {
 		super();
 		this.board = new Pawn[9][9];
@@ -73,6 +77,7 @@ public class StateTablut extends State implements Serializable {
 
 		result.setBoard(newboard);
 		result.setTurn(this.turn);
+		result.setDrawConditions(this.drawConditions);
 		return result;
 	}
 
@@ -102,6 +107,26 @@ public class StateTablut extends State implements Serializable {
 		if (this.turn != other.turn)
 			return false;
 		return true;
+	}
+
+	public List<State> getDrawConditions() {
+		return drawConditions;
+	}
+
+	public void setDrawConditions(List<State> drawConditions) {
+		this.drawConditions = drawConditions;
+	}
+	
+	public void clearDrawConditions() {
+		drawConditions.clear();
+	}
+
+	public int getMovesWithutCapturing() {
+		return movesWithutCapturing;
+	}
+
+	public void setMovesWithutCapturing(int movesWithutCapturing) {
+		this.movesWithutCapturing = movesWithutCapturing;
 	}
 
 }

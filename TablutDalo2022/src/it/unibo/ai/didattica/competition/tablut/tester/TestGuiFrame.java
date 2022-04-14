@@ -17,7 +17,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
-import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+//import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 
@@ -78,7 +78,7 @@ public class TestGuiFrame extends JFrame{
 			theGame=new GameModernTablut(10);
 			state.setBoard(board1);
 			break;
-		case 3:
+		/*case 3:
 			Pawn board2[][] = new Pawn[7][7];
 			for(int i=0;i<7;i++){
 				for(int j=0;j<7;j++){
@@ -89,7 +89,7 @@ public class TestGuiFrame extends JFrame{
 			state = new StateBrandub();
 			theGame=new GameTablut(10);
 			state.setBoard(board2);
-			break;
+			break;*/
 		case 4:
 			Pawn board3[][] = new Pawn[9][9];
 			for(int i=0;i<9;i++){

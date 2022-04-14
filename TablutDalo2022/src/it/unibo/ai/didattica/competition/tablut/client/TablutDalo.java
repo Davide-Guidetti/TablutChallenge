@@ -14,12 +14,13 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 public class TablutDalo extends TablutClient {
 	public static final String NAME = "Cliente";
 	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
+	Game<State, Action, String> rules;
 
 	//timeout= Maximal computation time in seconds.
 	public TablutDalo(String player, String name, int timeout, String ipAddress)
 			throws UnknownHostException, IOException {
 		super(player, name, timeout, ipAddress);
-		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
+		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
 		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
 
 	}
@@ -92,6 +93,7 @@ public class TablutDalo extends TablutClient {
 			}
 
 			state = this.getCurrentState();
+			state.setDrawConditions(((GameDaloTablut)rules).getDrawConditions());
 			// check if the game is finish
 
 			// I won

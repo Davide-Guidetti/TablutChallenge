@@ -30,7 +30,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
-import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+//import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.gui.Gui;
 import it.unibo.ai.didattica.competition.tablut.util.Configuration;
@@ -518,10 +518,10 @@ public class Server implements Runnable {
 			state = new StateTablut();
 			this.game = new GameModernTablut(moveCache);
 			break;
-		case 3:
+		/*case 3:
 			state = new StateBrandub();
 			this.game = new GameTablut(moveCache);
-			break;
+			break;*/
 		case 4:
 			state = new StateTablut();
 			state.setTurn(State.Turn.WHITE);

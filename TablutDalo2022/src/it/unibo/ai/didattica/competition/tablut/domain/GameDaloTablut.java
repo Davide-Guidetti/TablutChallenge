@@ -83,50 +83,34 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 
 		// if something has been captured, clear cache for draws
-		if (this.movesWithutCapturing == 0) {
-			this.drawConditions.clear();
-			this.loggGame.fine("Capture! Draw cache cleared!");
+		if (state.getMovesWithutCapturing() == 0) {
+			state.clearDrawConditions();
 		}
 
 		// controllo pareggio
 		int trovati = 0;
-		for (State s : drawConditions) {
-
-			System.out.println(s.toString());
-
+		for (State s : state.getDrawConditions()) {
 			if (s.equals(state)) {
-				// DEBUG: //
-				// System.out.println("UGUALI:");
-				// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-				// System.out.println("STATO NUOVO:\t" +
-				// state.toLinearString());
-
 				trovati++;
 				if (trovati > repeated_moves_allowed) {
 					state.setTurn(State.Turn.DRAW);
-					this.loggGame.fine("Partita terminata in pareggio per numero di stati ripetuti");
 					break;
 				}
 			} else {
-				// DEBUG: //
-				// System.out.println("DIVERSI:");
-				// System.out.println("STATO VECCHIO:\t" + s.toLinearString());
-				// System.out.println("STATO NUOVO:\t" +
-				// state.toLinearString());
 			}
 		}
 		if (trovati > 0) {
 			this.loggGame.fine("Equal states found: " + trovati);
 		}
-		if (cache_size >= 0 && this.drawConditions.size() > cache_size) {
-			this.drawConditions.remove(0);
+		if (cache_size >= 0 && state.getDrawConditions().size() > cache_size) {
+			state.getDrawConditions().remove(0);
 		}
-		this.drawConditions.add(state.clone());
+		state.getDrawConditions().add(state.clone());
 
-		this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
+		//this.loggGame.fine("Current draw cache size: " + this.drawConditions.size());
 
-		this.loggGame.fine("Stato:\n" + state.toString());
-		System.out.println("Stato:\n" + state.toString());
+		//this.loggGame.fine("Stato:\n" + state.toString());
+		//System.out.println("Stato:\n" + state.toString());
 
 		return state;
 	}
@@ -194,7 +178,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				// cont black soldier
 				if (b[i][j].equals(Pawn.BLACK)) {
 					contBlackSoldier++;
-					// controllo se il pedone nero è in un angolo
+					// controllo se il pedone nero ï¿½ in un angolo
 					value += this.blackSoldierInAngle(i, j, blackSoldierInAngleValue);
 					// controllo se il pedone blocca una uscita
 					value += this.pawnCanBlockEscape(i, j, stato, pawnCanBlockEscapeValue / 24); // diviso per il numero
@@ -223,7 +207,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0.0; // controlla perché cosi non ci vanno
+			return 0.0; // controlla perchï¿½ cosi non ci vanno
 		} else
 			return weight / 4; // 4 angle
 	}
@@ -240,7 +224,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		} else if (!stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
 			value += weight / 8;
 		} else
-		// controllo se il bianco è di fianco al re
+		// controllo se il bianco ï¿½ di fianco al re
 		if (stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
 			value += weight / 4;
 		} else if (stato.getBox(i - 1, j).equals(Pawn.WHITE)) {

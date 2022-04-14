@@ -13,7 +13,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameModernTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.GameTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
-import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
+//import it.unibo.ai.didattica.competition.tablut.domain.StateBrandub;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 
 /**
@@ -91,10 +91,10 @@ public class TablutRandomClient extends TablutClient {
 			state = new StateTablut();
 			rules = new GameModernTablut();
 			break;
-		case 3:
+		/*case 3:
 			state = new StateBrandub();
 			rules = new GameTablut();
-			break;
+			break;*/
 		case 4:
 			state = new StateTablut();
 			state.setTurn(State.Turn.WHITE);
