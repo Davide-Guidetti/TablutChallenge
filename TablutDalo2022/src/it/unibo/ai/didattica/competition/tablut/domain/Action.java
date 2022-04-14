@@ -3,6 +3,7 @@ package it.unibo.ai.didattica.competition.tablut.domain;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.InvalidParameterException;
+import java.util.Objects;
 
 /**
  * this class represents an action of a player
@@ -90,6 +91,23 @@ public class Action implements Serializable {
 	 */
 	public int getRowTo() {
 		return Integer.parseInt(this.to.charAt(1) + "") - 1;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(from, to, turn);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Action other = (Action) obj;
+		return Objects.equals(from, other.from) && Objects.equals(to, other.to) && turn == other.turn;
 	}
 
 }

@@ -661,7 +661,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 			throw new IllegalArgumentException("no moves");
 		}
-		Collections.shuffle(resultChecked);
+		//Collections.shuffle(resultChecked);
 		return resultChecked;
 	}
 
