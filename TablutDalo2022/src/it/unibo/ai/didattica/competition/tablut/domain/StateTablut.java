@@ -77,7 +77,7 @@ public class StateTablut extends State implements Serializable {
 
 		result.setBoard(newboard);
 		result.setTurn(this.turn);
-		result.setDrawConditions(this.drawConditions);
+		result.setDrawConditions(new ArrayList<>(this.drawConditions));
 		return result;
 	}
 
