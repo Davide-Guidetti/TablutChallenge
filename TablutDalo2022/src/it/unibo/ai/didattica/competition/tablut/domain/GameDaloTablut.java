@@ -16,7 +16,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	public static final double soldierNearCastleValue = 0.4; // CASO E
 	public static final double soldierNearCampValue = 0.5; // CASO F
-	public static final double kingUnderAttackValue = 0.6; // CASO G
+	public static final double kingUnderAttackValue = 0.8; // CASO G
 	public static final double remainSoldierValue = 0.3; // CASO B
 	public static final double kingCanEscapeValue = 0.8;
 	public static final double pawnCanBlockEscapeValue = 0.15;
@@ -207,7 +207,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	private double blackSoldierInAngle(int i, int j, double weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0.0; // controlla perch� cosi non ci vanno
+			return 0.0; 
 		} else
 			return weight / 4; // 4 angle
 	}
@@ -224,7 +224,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		} else if (!stato.getBox(i, j - 1).equals(Pawn.BLACK)) {
 			value += weight / 8;
 		} else
-		// controllo se il bianco � di fianco al re
+		// controllo se il bianco di fianco al re
 		if (stato.getBox(i + 1, j).equals(Pawn.WHITE)) {
 			value += weight / 4;
 		} else if (stato.getBox(i - 1, j).equals(Pawn.WHITE)) {

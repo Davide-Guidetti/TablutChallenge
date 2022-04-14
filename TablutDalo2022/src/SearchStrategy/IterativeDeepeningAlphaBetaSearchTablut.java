@@ -12,6 +12,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> extends IterativeD
 
 	@Override
 	protected double eval(S state, P player) {
+		super.eval(state, player);
+		if (!game.isTerminal(state)) heuristicEvaluationUsed = true;
 		return game.getUtility(state, player);
 	}
 }
