@@ -86,6 +86,7 @@ class TestAlgorithm {
 		System.out.println();
 		
 		Action chosenAction = searchStrategy.makeDecision(state);
+		
 		try {
 			assertEquals(new Action(4,2,0,2,currentTurn), chosenAction);
 		} catch (IOException e) {
@@ -151,11 +152,14 @@ class TestAlgorithm {
 						if (logEnabled)
 							logText.append("value for top level action " + action + " = " + value + " \n");
 					}
-					if (logEnabled)
-						System.out.println(logText);
 					if (newResults.size() > 0) {
 						results = newResults.actions;
+						logText.append("Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0) + " (max possible value: " + GameDaloTablut.getMaxValueHeuristic() + ")\n");
+					}else {
+						//TODO
+						logText.append("No action to chose from");
 					}
+					if (logEnabled) System.out.println(logText);
 				} while (/*!timer.timeOutOccured() && */ heuristicEvaluationUsed && currDepthLimit<MaxExpansionLevel);
 				
 				return results.get(0);
