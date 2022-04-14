@@ -216,7 +216,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	private double canEat(int i, int j, double eatValue) {
 		double value = 0;
 		//System.out.println("EATVALUE: " + eatValue);
-		eatValue = eatValue / 6;
+		eatValue=eatValue/12; //worst case
 		// eat right
 		if (i + 2 < 9 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i + 1][j].equals(Pawn.BLACK)
 				&& ((b[i + 2][j].equals(Pawn.WHITE) || b[i + 2][j].equals(Pawn.KING)) || this.isCampo(i + 2, j)

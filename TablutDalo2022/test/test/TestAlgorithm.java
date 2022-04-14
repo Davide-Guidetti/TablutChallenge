@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut;
 import aima.core.search.adversarial.Game;
-import aima.core.search.framework.Metrics;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
