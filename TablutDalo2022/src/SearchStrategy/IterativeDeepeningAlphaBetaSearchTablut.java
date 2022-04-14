@@ -1,7 +1,9 @@
 package SearchStrategy;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import aima.core.search.adversarial.AdversarialSearch;
 import aima.core.search.adversarial.Game;
@@ -22,7 +24,12 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	protected double utilMin;
 	protected int currDepthLimit;
 	protected boolean heuristicEvaluationUsed; // indicates that non-terminal nodes have been evaluated.
+	
+	public boolean graphOptimization = true; //keeps references to expanded states, in order to check if the same state has already been expanded
+	HashSet<S> expandedStates = new HashSet<>();
+	
 	private Timer timer;
+	public boolean timedOut; //algorithm stopped search because of timeout
 	public Statistics statistics;
 	protected Statistics runningStatistics;
 	
@@ -47,6 +54,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 		P player = game.getPlayer(state);
 		List<A> results = game.getActions(state);
 		timer.start();
+		timedOut = false;
 		currDepthLimit = 0;
 		metrics = new Metrics();
 		do {
@@ -56,6 +64,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 			runningStatistics = new Statistics();
 			runningStatistics.reachedDepth = currDepthLimit;
 			ActionStore<A> newResults = new ActionStore<>();
+			expandedStates.clear();
 			for (A action : results) {
 				double value = minValue(
 						(logEnabled) ? logExpansion(
@@ -89,6 +98,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 				heuristicEvaluationUsed &&  //heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
 				currDepthLimit < maxDepth   //currentDepth reached maxDepth
 		);
+		if(timer.timeOutOccurred()) timedOut=true;
 		return results.get(0);
 	}
 	
@@ -101,8 +111,14 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 		} else {
 			double value = Double.NEGATIVE_INFINITY;
 			for (A action : game.getActions(state)) {
-				value = Math.max(value, minValue(game.getResult(state, action), //
-						player, alpha, beta, depth + 1));
+				S newState = game.getResult(state, action);
+				if(graphOptimization) {
+					if(expandedStates.add(newState)==false) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+						runningStatistics.skippedSameNodes++;
+						continue;
+					}
+				}
+				value = Math.max(value, minValue(newState, player, alpha, beta, depth + 1));
 				if (value >= beta)
 					return value;
 				alpha = Math.max(alpha, value);
@@ -120,8 +136,14 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 		} else {
 			double value = Double.POSITIVE_INFINITY;
 			for (A action : game.getActions(state)) {
-				value = Math.min(value, maxValue(game.getResult(state, action), //
-						player, alpha, beta, depth + 1));
+				S newState = game.getResult(state, action);
+				if(graphOptimization) {
+					if(expandedStates.add(newState)==false) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+						runningStatistics.skippedSameNodes++;
+						continue;
+					}
+				}
+				value = Math.min(value, maxValue(newState, player, alpha, beta, depth + 1));
 				if (value <= alpha)
 					return value;
 				beta = Math.min(beta, value);
@@ -196,16 +218,19 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	public static class Statistics {
 		public long expandedNodes;
 		public long reachedDepth;
+		public long skippedSameNodes;
 		
 		public Statistics() {
 			expandedNodes = 0;
 			reachedDepth = 0;
+			skippedSameNodes = 0;
 		}
 		
 		public String toString() {
 			return "SEARCH STATISTICS:\n" +
 					"expandedNodes: " + expandedNodes + "\n" +
-					"reachedDepth: " + reachedDepth + "\n";
+					"skippedSameNodes: " + skippedSameNodes + "\n" +
+					"reachedDepth: " + reachedDepth + "\n" ;
 		}
 	}
 }

@@ -15,7 +15,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 
-class TestGame {
+class TestActionGeneration {
 
 	@Test
 	void test() throws IOException {
@@ -54,7 +54,10 @@ class TestGame {
 		testActionGeneration(new StateTablut());
 	}
 	
-	void testActionGeneration(State state) throws IOException { //test if action generation or all pawns in a state coincides with the checks made by the professors 
+	/*
+	 * test if action generation or all pawns in a state coincides with the checks made by the professors 
+	 */
+	static void testActionGeneration(State state) throws IOException {
 		Pawn[][] board = state.getBoard();
 		List<Action> allLegalActions = new ArrayList<>();
 		List<Action> generatedActions;
@@ -93,7 +96,9 @@ class TestGame {
 	}
 	
 	
-	
+	/*
+	 * Generate ALL moves of a paws until he encounter or another pawn, or the wall. Those include illegal states
+	 */
 	private static List<Action> getAllPawnActions(int row, int column, Pawn[][] board, Turn turn) throws IOException {
 		List<Action> result = new ArrayList<>();
 

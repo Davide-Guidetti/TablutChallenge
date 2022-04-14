@@ -21,6 +21,7 @@ public class TablutDaloBlack extends TablutClient {
 		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black",this.getPlayer());
 		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
 		searchStrategy.printStatistics=true;
+		searchStrategy.graphOptimization=true;
 	}
 
 	public static void main(String[] args) {
