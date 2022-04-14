@@ -86,6 +86,19 @@ public abstract class State {
 		}
 		return result.toString();
 	}
+	
+	public String boardStringWithCellIndex() {
+		StringBuffer result = new StringBuffer();
+		result.append(" ABCDEFGHI\n");
+		for(int i=0; i<this.board.length; i++) {
+			result.append(i+1);
+			for(int j=0; j<this.board[0].length; j++) {
+				result.append(this.board[i][j].toString());
+			}
+			result.append("\n");
+		}
+		return result.toString();
+	}
 
 	@Override
 	public String toString() {

@@ -2,6 +2,7 @@ package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut;
 import aima.core.search.adversarial.Game;
-import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch.ActionStore;
 import aima.core.search.framework.Metrics;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
@@ -19,14 +19,22 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 class TestAlgorithm {
+	
+	Turn currentTurn = Turn.WHITE;
+	Game<State, Action, String> rules;
+	IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
+	
 
 	@Test
 	void testStateExpansion() {
 		State state = new StateTablut();
-		state.setTurn(Turn.BLACK);
+		
+		Turn currentTurn = Turn.WHITE;
+		state.setTurn(currentTurn);
+		
 		
 		Pawn [][] board = new Pawn[9][9];
-
+		
 		for (int i = 0; i < 9; i++) {
 			for (int j = 0; j < 9; j++) {
 				board[i][j] = Pawn.EMPTY;
@@ -41,6 +49,7 @@ class TestAlgorithm {
 		board[5][4] = Pawn.WHITE;
 		board[6][4] = Pawn.WHITE;
 		board[4][2] = Pawn.WHITE;
+		board[4][2] = Pawn.KING;
 		board[4][3] = Pawn.WHITE;
 		board[4][5] = Pawn.WHITE;
 		board[4][6] = Pawn.WHITE;
@@ -62,14 +71,40 @@ class TestAlgorithm {
 		board[5][8] = Pawn.BLACK;
 		board[4][7] = Pawn.BLACK;
 		
+		
+		//put the king in a position in which he could escape
+		board[4][4] = Pawn.THRONE; //replace king
+		board[4][2] = Pawn.KING;
+		board[5][2] = Pawn.WHITE;// put a soldire so that the kink have only one way to escape
+		
 		state.setBoard(board);
 		
-		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black");
-		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
+		constructObjects();
+		//searchStrategy.MaxExpansionLevel = 1;
+		
+		System.out.println("finding action for state");
+		System.out.println(state.boardString());
+		System.out.println();
+		
+		Action chosenAction = searchStrategy.makeDecision(state);
+		try {
+			assertEquals(new Action(4,2,0,2,currentTurn), chosenAction);
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	private void constructObjects() {
+		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
+		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
 			
-			private boolean logEnabled = true;
+			protected boolean logEnabled = true;
+			protected boolean heuristicEvaluationUsed;
 			
-			private static class ActionStore<ACTION> {
+			public int MaxExpansionLevel = 1;
+
+			class ActionStore<ACTION> {
 				private List<ACTION> actions = new ArrayList<ACTION>();
 				private List<Double> utilValues = new ArrayList<Double>();
 
@@ -94,34 +129,55 @@ class TestAlgorithm {
 				currDepthLimit = 0;
 				do {
 					incrementDepthLimit();
-					if (logEnabled)
-						logText = new StringBuffer("depth " + currDepthLimit + ": ");
+					if (logEnabled) logText = new StringBuffer("depth " + currDepthLimit + ": ");
 					heuristicEvaluationUsed = false;
 					ActionStore<Action> newResults = new ActionStore<Action>();
+					logText.append("Evluating up to depth " + currDepthLimit + "... \n");
 					for (Action action : results) {
-						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY,
-								Double.POSITIVE_INFINITY, 1);
+						double value = minValue(
+								logExpansion(
+										game.getResult(state, action), 
+										action,
+										player,
+										logText
+								),
+								player, 
+								Double.NEGATIVE_INFINITY, 
+								Double.POSITIVE_INFINITY, 
+								1
+						);
+						/*if (timer.timeOutOccured())
+							break; // exit from action loop*/
 						newResults.add(action, value);
 						if (logEnabled)
-							logText.append(action + "->" + value + " ");
+							logText.append("value for top level action " + action + " = " + value + " \n");
 					}
 					if (logEnabled)
 						System.out.println(logText);
 					if (newResults.size() > 0) {
 						results = newResults.actions;
-						if (!timer.timeOutOccured()) {
-							if (hasSafeWinner(newResults.utilValues.get(0)))
-								break; // exit from iterative deepening loop
-							else if (newResults.size() > 1
-									&& isSignificantlyBetter(newResults.utilValues.get(0), newResults.utilValues.get(1)))
-								break; // exit from iterative deepening loop
-						}
 					}
-				} while (!timer.timeOutOccured() && heuristicEvaluationUsed);
+				} while (/*!timer.timeOutOccured() && */ heuristicEvaluationUsed && currDepthLimit<MaxExpansionLevel);
+				
 				return results.get(0);
 			}
+			
+			private State logExpansion(State state, Action action, String player, StringBuffer logText) {
+				logText.append("\n");
+				logText.append("Evaluation for action: \"" + action+"\"\n");
+				logText.append(state.boardStringWithCellIndex());
+				double utility = game.getUtility(state, player);
+				logText.append("State utility for " + player + ": " + utility +"\n");
+				checkUtilityInRange(utility);
+				return state;
+			}
+
+			private void checkUtilityInRange(double utility) {
+				if(utility < 0 && utility > GameDaloTablut.getMaxValueHeuristic()) {
+					fail("Utility out of range: utility=" + utility + " out of range [" + 0.0 + "," + GameDaloTablut.getMaxValueHeuristic() + "]");
+				}				
+			}
 		};
-	
 	}
 
 }
