@@ -69,6 +69,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 			ActionStore<A> newResults = new ActionStore<>();
 			expandedStates.clear();
 			System.gc();
+			long startTime = System.currentTimeMillis();
 			for (A action : results) {
 				try {
 					S newState = game.getResult(state, action);
@@ -99,6 +100,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 					break;
 				}
 			}
+			long endTime = System.currentTimeMillis();
+			System.out.println("Elapsed Time: " + (endTime-startTime) + "\n");
 			if (newResults.size() > 0) {
 				results = newResults.actions;
 				if (logEnabled) logText.append("Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0) + " (max possible value: " + GameDaloTablut.getMaxValueHeuristic() + ")\n");

@@ -30,7 +30,8 @@ class TestGameEvolution {
 		// ------------- RECORD EVOLUTION WITHOUT USING OPTIMIZATION --------------
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
 		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
-		searchStrategyBlack.printStatistics=false;
+		searchStrategyBlack.logEnabled=true;
+		searchStrategyBlack.printStatistics=true;
 		searchStrategyBlack.graphOptimization=false;
 		searchStrategyBlack.maxDepth = maxDepth;
 		
