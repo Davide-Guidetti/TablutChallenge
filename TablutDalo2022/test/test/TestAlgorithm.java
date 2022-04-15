@@ -130,22 +130,22 @@ class TestAlgorithm {
 	
 	private void constructObjects() {
 		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
-		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60) {
+		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0, GameDaloTablut.getMaxValueHeuristic(), 60) {
 			
 			@Override
 			protected State logExpansion(State state, Action action, String player, StringBuffer logText) {
 				logText.append("\n");
 				logText.append("Evaluation for action: \"" + action+"\"\n");
 				logText.append(state.boardStringWithCellIndex());
-				double utility = game.getUtility(state, player);
+				int utility = game.getUtility(state, player);
 				logText.append("State utility for " + player + ": " + utility +"\n");
 				checkUtilityInRange(utility);
 				return state;
 			}
 
-			private void checkUtilityInRange(double utility) {
+			private void checkUtilityInRange(int utility) {
 				if(utility < 0 || utility > GameDaloTablut.getMaxValueHeuristic()) {
-					fail("Utility out of range: utility=" + utility + " out of range [" + 0.0 + "," + GameDaloTablut.getMaxValueHeuristic() + "]");
+					fail("Utility out of range: utility=" + utility + " out of range [" + 0 + "," + GameDaloTablut.getMaxValueHeuristic() + "]");
 				}				
 			}
 		};

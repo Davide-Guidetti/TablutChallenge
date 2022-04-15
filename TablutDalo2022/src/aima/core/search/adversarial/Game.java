@@ -47,5 +47,5 @@ public interface Game<S, A, P> {
 
     boolean isTerminal(S state);
 
-    double getUtility(S state, P player);
+    int getUtility(S state, P player);
 }

@@ -14,22 +14,22 @@ import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 public class GameDaloTablut extends GameAshtonTablut implements Game<State, Action, String> {
 	private static final String[] PLAYERS = { "white", "black" };
-	private static boolean DEBUG = false; //HEAVY!
+	private static boolean DEBUG = false; // HEAVY!
 	private Pawn[][] b;
 	private State.Turn player;
 
-	public static final double soldierNearCastleValue = 0.4; // CASO E
-	public static final double soldierNearCampValue = 0.5; // CASO F
-	public static final double kingUnderAttackValue = 0.8; // CASO G
-	public static final double remainSoldierValue = 2.0; // CASO B
-	public static final double kingCanEscapeValue = 0.8;
-	public static final double pawnCanBlockEscapeValue = 0.1;
-	public static final double kingProtectValue = 0.3;
-	public static final double blackSoldierInAngleValue = 0.1;
-	public static final double whiteSoldierInAngleValue = 0.1;
-	public static final double eatValue = 1;
+	public static final int soldierNearCastleValue = 4000; // CASO E
+	public static final int soldierNearCampValue = 5000; // CASO F
+	public static final int kingUnderAttackValue = 8000; // CASO G
+	public static final int remainSoldierValue = 20000; // CASO B
+	public static final int kingCanEscapeValue = 8000;
+	public static final int pawnCanBlockEscapeValue = 1000;
+	public static final int kingProtectValue = 3000;
+	public static final int blackSoldierInAngleValue = 1000;
+	public static final int whiteSoldierInAngleValue = 1000;
+	public static final int eatValue = 1000;
 
-	public static double getMaxValueHeuristic() {
+	public static int getMaxValueHeuristic() {
 		return soldierNearCastleValue + soldierNearCampValue + kingUnderAttackValue + remainSoldierValue
 				+ kingCanEscapeValue + kingProtectValue + pawnCanBlockEscapeValue + blackSoldierInAngleValue
 				+ whiteSoldierInAngleValue + eatValue;
@@ -55,10 +55,11 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	public String getPlayer(State stato) {
 		return stato.getTurn().name();
 	}
-	
+
 	@Override
 	public boolean isTerminal(State stato) {
-		return stato.getTurn().equals(Turn.WHITEWIN) || stato.getTurn().equals(Turn.BLACKWIN) || stato.getTurn().equals(Turn.DRAW);
+		return stato.getTurn().equals(Turn.WHITEWIN) || stato.getTurn().equals(Turn.BLACKWIN)
+				|| stato.getTurn().equals(Turn.DRAW);
 	}
 
 	@Override
@@ -94,22 +95,22 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 				}
 			}
 		}
-		
-		if (DEBUG) { //check if all generated actions are actually legal for the prof's checks
+
+		if (DEBUG) { // check if all generated actions are actually legal for the prof's checks
 			for (Action action : result) {
 				if (!checkAction(stato, action)) {
 					System.err.println("Error!! illegal action was generated");
 					System.err.println("State: ");
 					System.err.println(stato.boardStringWithCellIndex());
-					System.err.println("illegal Action: \" "+ action + "\"");
+					System.err.println("illegal Action: \" " + action + "\"");
 					System.exit(10);
 				}
 			}
 		}
-		//Collections.shuffle(result);
+		// Collections.shuffle(result);
 		return result;
 	}
-	
+
 	@Override
 	public State getResult(State stateInital, Action a) {
 		State state = stateInital.clone();
@@ -177,7 +178,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 	// HEURISTIC FUNCTION
 	@Override
-	public double getUtility(State stato, String playerCurrent) {
+	public int getUtility(State stato, String playerCurrent) {
 		// System.out.println("MAXVALUE:="+soldierNearCastleValue + soldierNearCampValue
 		// + kingUnderAttack + remainSoldierValue
 		// + kingCanEscapeValue + (pawnCanBlockEscapeValue * 16));
@@ -188,7 +189,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 			return GameDaloTablut.getMaxValueHeuristic();
 		}
 		if (stato.getTurn().equals(Turn.WHITEWIN) && playerCurrent.equalsIgnoreCase(Turn.BLACK.name())) {
-			return 0.0;
+			return 0;
 		}
 		if (stato.getTurn().equals(Turn.BLACKWIN) && playerCurrent.equalsIgnoreCase(Turn.BLACK.name())) {
 			return GameDaloTablut.getMaxValueHeuristic();
@@ -200,7 +201,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 			return GameDaloTablut.getMaxValueHeuristic() / 2;
 		}
 
-		double value = 0;
+		int value = 0;
 		int contWhiteSoldier = 0;
 		int contBlackSoldier = 0;
 		b = stato.getBoard();
@@ -216,7 +217,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 							|| (i == 8 && (j == 1 || j == 2 || j == 6 || j == 7))
 							|| (j == 0 && (i == 1 || i == 2 || i == 6 || i == 7))
 							|| (j == 8 && (i == 1 || i == 2 || i == 6 || i == 7))) {
-						return player.equals(Turn.WHITE) ? GameDaloTablut.getMaxValueHeuristic() : 0.0;
+						return player.equals(Turn.WHITE) ? GameDaloTablut.getMaxValueHeuristic() : 0;
 					}
 					// check if king can escape
 					if (!((i >= 3 && i <= 5) || (j >= 3 && j <= 5))) {
@@ -249,9 +250,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		// check if king is alive
 		if (!found)
-			return player.equals(Turn.WHITE) ? 0.0 : GameDaloTablut.getMaxValueHeuristic();
+			return player.equals(Turn.WHITE) ? 0 : GameDaloTablut.getMaxValueHeuristic();
 		// CASO B soldati rimanenti
-		value += ((2 * contWhiteSoldier - contBlackSoldier) / 32 + 0.5) * remainSoldierValue;
+		value += (((2 * contWhiteSoldier - contBlackSoldier) + 16) / 32) * remainSoldierValue;
 		// CASO E controllo castello
 		value += this.soldierNearCastle(soldierNearCastleValue);
 		// CASO F controllo campi
@@ -261,15 +262,16 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (player.equals(Turn.BLACK))
 			value = GameDaloTablut.getMaxValueHeuristic() - value;
 
-		//System.out.println("value: " + value / GameDaloTablut.getMaxValueHeuristic());
+		// System.out.println("value: " + value /
+		// GameDaloTablut.getMaxValueHeuristic());
 
 		return value;
 	}
 
-	private double canEat(int i, int j, double eatValue) {
-		double value = 0;
-		//System.out.println("EATVALUE: " + eatValue);
-		eatValue=eatValue/12; //worst case
+	private int canEat(int i, int j, int eatValue) {
+		int value = 0;
+		// System.out.println("EATVALUE: " + eatValue);
+		eatValue = eatValue / 12; // worst case
 		// eat right
 		if (i + 2 < 9 && (b[i][j].equals(Pawn.WHITE) || b[i][j].equals(Pawn.KING)) && b[i + 1][j].equals(Pawn.BLACK)
 				&& ((b[i + 2][j].equals(Pawn.WHITE) || b[i + 2][j].equals(Pawn.KING)) || this.isCampo(i + 2, j)
@@ -280,7 +282,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		if (i + 2 < 9 && b[i][j].equals(Pawn.BLACK) && b[i + 1][j].equals(Pawn.WHITE)
 				&& (b[i + 2][j].equals(Pawn.BLACK) || this.isCampo(i + 2, j) || (i + 2 == 4 && j == 4))) {
-			value += 0.0;
+			value += 0;
 		} else {
 			value += eatValue / 2;
 		}
@@ -308,7 +310,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		if (j + 2 < 9 && b[i][j].equals(Pawn.BLACK) && b[1][j + 1].equals(Pawn.WHITE)
 				&& (b[2][j + 2].equals(Pawn.BLACK) || this.isCampo(i, j + 2) || (i == 4 && j + 2 == 4))) {
-			value += 0.0;
+			value += 0;
 		} else {
 			value += eatValue / 2;
 		}
@@ -322,11 +324,11 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		if (j - 2 >= 0 && b[i][j].equals(Pawn.BLACK) && b[i][j - 1].equals(Pawn.WHITE)
 				&& (b[i][j - 2].equals(Pawn.BLACK) || this.isCampo(i, j - 2) || (j + 2 == 4 && i == 4))) {
-			value += 0.0;
+			value += 0;
 		} else {
 			value += eatValue / 2;
 		}
-		//System.out.println("EATVALUE VALUE: " + value);
+		// System.out.println("EATVALUE VALUE: " + value);
 		return value;
 	}
 
@@ -339,22 +341,22 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 			return false;
 	}
 
-	private double blackSoldierInAngle(int i, int j, double weight) {
+	private int blackSoldierInAngle(int i, int j, int weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
 			return weight / 4; // 4 angle
 		} else
-			return 0.0;
+			return 0;
 	}
 
-	private double whiteSoldierInAngle(int i, int j, double weight) {
+	private int whiteSoldierInAngle(int i, int j, int weight) {
 		if ((i == 0 && j == 0) || (i == 0 && j == 8) || (i == 8 && j == 8) || (i == 8 && j == 0)) {
-			return 0.0;
+			return 0;
 		} else
 			return weight / 4; // 4 angle
 	}
 
-	private double kingProtect(int i, int j, State stato, double weight) {
-		double value = 0;
+	private double kingProtect(int i, int j, State stato, int weight) {
+		int value = 0;
 		// controllo se non ci sono neri vicino al re
 		if (!b[i + 1][j].equals(Pawn.BLACK)) {
 			value += weight / 8;
@@ -388,10 +390,10 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return value;
 	}
 
-	private double kingUnderAttack(int i, int j, State stato, double weight) {
+	private int kingUnderAttack(int i, int j, State stato, int weight) {
 		// re nel castello
 		int soldierBlack = 0;
-		double value = 0;
+		int value = 0;
 		if (i == 4 && j == 4) {
 			if (b[3][4].equals(Pawn.BLACK)) {
 				soldierBlack++;
@@ -473,7 +475,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (this.getPlayer(stato).equalsIgnoreCase("blak")) {
 			if ((b[i + 1][j].equals(Pawn.BLACK) && b[i - 1][j].equals(Pawn.BLACK))
 					|| (b[i][j + 1].equals(Pawn.BLACK) && b[i][j - 1].equals(Pawn.BLACK))) {
-				value += 0.0;
+				value += 0;
 			}
 		}
 		// tutti gli altri casi
@@ -483,7 +485,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return value;
 	}
 
-	private double pawnCanBlockEscape(int i, int j, State stato, double weight) {
+	private int pawnCanBlockEscape(int i, int j, State stato, int weight) {
 		if (this.getPlayer(stato).equalsIgnoreCase("black")) {
 			if ((i == 1 && j == 6) || (i == 0 && j == 6) || (i == 0 && j == 7) || (i == 1 && j == 7)
 					|| (i == 2 && j == 7) || (i == 1 && j == 8) || (i == 2 && j == 8) || (i == 6 && j == 7)
@@ -492,7 +494,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					|| (i == 7 && j == 0) || (i == 7 && j == 1) || (i == 7 && j == 2) || (i == 8 && j == 1)
 					|| (i == 8 && j == 2) || (i == 0 && j == 1) || (i == 1 && j == 1) || (i == 0 && j == 2)
 					|| (i == 1 && j == 2) || (i == 2 && j == 1) || (i == 1 && j == 0) || (i == 2 && j == 0)) {
-				return 0.0;
+				return 0;
 			} else {
 				return weight;
 			}
@@ -506,13 +508,13 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 					&& !(i == 1 && j == 2) && !(i == 2 && j == 1) && !(i == 1 && j == 0) && !(i == 2 && j == 0)) {
 				return weight;
 			} else {
-				return 0.0;
+				return 0;
 			}
 		}
 	}
 
-	private double kingCanEscape(int i, int j, double weight) {
-		//System.out.println("CHECK SE IN TRAIETTORIA");
+	private int kingCanEscape(int i, int j, int weight) {
+		// System.out.println("CHECK SE IN TRAIETTORIA");
 		int contPawn = 0;
 		for (int row = 0; row < i; row++) {
 			if (b[row][j].equals(Pawn.WHITE) || b[row][j].equals(Pawn.BLACK)) {
@@ -545,10 +547,10 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		if (contPawn == 0)
 			return weight;
-		return 0.0;
+		return 0;
 	}
 
-	private double soldierNearCastle(double weight) {
+	private int soldierNearCastle(int weight) {
 		int contCastleWhite = 0;
 		int contCastleBlack = 0;
 		if (b[4][3].equals(Pawn.WHITE)) {
@@ -578,7 +580,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		return (((contCastleBlack - contCastleWhite * 2) + 8) / 12) * weight;
 	}
 
-	private double soldierNearCamp(double weight) {
+	private int soldierNearCamp(int weight) {
 		int contCampleWhite = 0;
 		int contCampleBlack = 0;
 		if (b[1][3].equals(Pawn.WHITE)) {
@@ -653,52 +655,60 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		if (b[5][7].equals(Pawn.BLACK)) {
 			contCampleBlack++;
 		}
-		return ((contCampleBlack - contCampleWhite * 2) / 32 + 0.5) * weight;
+		return (((contCampleBlack - contCampleWhite * 2) + 16) / 32) * weight;
 	}
-	
-	
-	// ------------------------------------------------------------------ ACTION GENERATION AND CHECKING ------------------------------------------------------------------------------
+
+	// ------------------------------------------------------------------ ACTION
+	// GENERATION AND CHECKING
+	// ------------------------------------------------------------------------------
 	public static List<Action> getPawnActions(int row, int column, Pawn[][] board, Turn turn) throws IOException {
 		List<Action> result = new ArrayList<>();
-		boolean canEnterCitadel = turn.equals(Turn.BLACK) && GameAshtonTablut.citadels.contains(State.getBox(row, column)); //this pawn can enter a citadel (WHITE and BLACK out of citadels cannot enter in citadels)
+		boolean canEnterCitadel = turn.equals(Turn.BLACK)
+				&& GameAshtonTablut.citadels.contains(State.getBox(row, column)); // this pawn can enter a citadel
+																					// (WHITE and BLACK out of citadels
+																					// cannot enter in citadels)
 
 		// Check at the bottom
 		for (int i = row + 1; i < board.length && board[i][column].equals(Pawn.EMPTY)
-				 && (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(i, column))); i++) {
-			if(canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(i, column)) && Math.abs(row-i)>5) continue; //black cannot move from a citadel in a side to a citadel in another side
+				&& (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(i, column))); i++) {
+			if (canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(i, column)) && Math.abs(row - i) > 5)
+				continue; // black cannot move from a citadel in a side to a citadel in another side
 			result.add(new Action(row, column, i, column, turn));
 		}
 
 		// Check at the top
 		for (int i = row - 1; i >= 0 && board[i][column].equals(Pawn.EMPTY)
-				 && (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(i, column))); i--) {
-			if(canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(i, column)) && Math.abs(row-i)>5) continue; //black cannot move from a citadel in a side to a citadel in another side
+				&& (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(i, column))); i--) {
+			if (canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(i, column)) && Math.abs(row - i) > 5)
+				continue; // black cannot move from a citadel in a side to a citadel in another side
 			result.add(new Action(row, column, i, column, turn));
 		}
 
 		// Check at the right
 		for (int j = column + 1; j < board[row].length && board[row][j].equals(Pawn.EMPTY)
-				 && (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(row, j))); j++) {
-			if(canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(row, j)) && Math.abs(column-j)>5) continue; //black cannot move from a citadel in a side to a citadel in another side
+				&& (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(row, j))); j++) {
+			if (canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(row, j)) && Math.abs(column - j) > 5)
+				continue; // black cannot move from a citadel in a side to a citadel in another side
 			result.add(new Action(row, column, row, j, turn));
 		}
 
 		// Check at the left
 		for (int j = column - 1; j >= 0 && board[row][j].equals(Pawn.EMPTY)
-				 && (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(row, j))); j--) {
-			if(canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(row, j)) && Math.abs(column-j)>5) continue; //black cannot move from a citadel in a side to a citadel in another side
+				&& (canEnterCitadel || !GameAshtonTablut.citadels.contains(State.getBox(row, j))); j--) {
+			if (canEnterCitadel && GameAshtonTablut.citadels.contains(State.getBox(row, j)) && Math.abs(column - j) > 5)
+				continue; // black cannot move from a citadel in a side to a citadel in another side
 			result.add(new Action(row, column, row, j, turn));
 		}
 
 		return result;
 	}
-	
-	//this is only needed if you want to do some extra checks now
+
+	// this is only needed if you want to do some extra checks now
 	public static boolean checkAction(State state, Action a) {
-		//if (DEBUG) System.out.println(a.toString());
+		// if (DEBUG) System.out.println(a.toString());
 		// controllo la mossa
 		if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
-			if (DEBUG) 
+			if (DEBUG)
 				System.out.println("Formato mossa errato");
 			return false;
 		}
@@ -760,7 +770,8 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 
 		// controllo se sto muovendo una pedina giusta
-		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve controllare)
+		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve
+		// controllare)
 		if (state.getTurn().equalsTurn(State.Turn.WHITE.toString())) {
 			if (!state.getPawn(rowFrom, columnFrom).equalsPawn("W")
 					&& !state.getPawn(rowFrom, columnFrom).equalsPawn("K")) {
@@ -778,14 +789,16 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 
 		// controllo di non muovere in diagonale
-		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve controllare)
+		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve
+		// controllare)
 		if (rowFrom != rowTo && columnFrom != columnTo) {
 			if (DEBUG)
 				System.out.println("Mossa in diagonale");
 			return false;
 		}
 
-		// controllo di non scavalcare pedine (o altro... trono, citadels se sono un bianco, ecc..)
+		// controllo di non scavalcare pedine (o altro... trono, citadels se sono un
+		// bianco, ecc..)
 		if (rowFrom == rowTo) {
 			if (columnFrom > columnTo) {
 				for (int i = columnTo; i < columnFrom; i++) {
@@ -871,5 +884,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		}
 		return true;
 	}
-	// ---------------------------------------------------------- END   ACTION GENERATION AND CHECKING ------------------------------------------------------------------------------
+	// ---------------------------------------------------------- END ACTION
+	// GENERATION AND CHECKING
+	// ------------------------------------------------------------------------------
 }

@@ -20,8 +20,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	protected Metrics metrics = new Metrics();
 
 	protected Game<S, A, P> game;
-	protected double utilMax;
-	protected double utilMin;
+	protected int utilMax;
+	protected int utilMin;
 	protected int currDepthLimit;
 	protected boolean heuristicEvaluationUsed; // indicates that non-terminal nodes have been evaluated.
 	
@@ -41,7 +41,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	
 	
 	
-	public IterativeDeepeningAlphaBetaSearchTablut(Game<S, A, P> game, double utilMin, double utilMax, int time) {
+	public IterativeDeepeningAlphaBetaSearchTablut(Game<S, A, P> game, int utilMin, int utilMax, int time) {
 		//super(game, utilMin, utilMax, time);
 		this.game = game;
 		this.utilMin = utilMin;
@@ -79,7 +79,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 							continue;
 						}
 					}
-					double value = minValue(
+					int value = minValue(
 							(logEnabled) ? logExpansion(
 										newState, 
 										action,
@@ -87,8 +87,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 										logText
 								) : game.getResult(state, action),
 							player, 
-							Double.NEGATIVE_INFINITY, 
-							Double.POSITIVE_INFINITY, 
+							Integer.MIN_VALUE, 
+							Integer.MAX_VALUE, 
 							1
 					);
 					if (timer.timeOutOccurred()) break; // exit from action loop
@@ -121,13 +121,13 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	}
 	
 	// returns an utility value
-	public double maxValue(S state, P player, double alpha, double beta, int depth) {
+	public int maxValue(S state, P player, int alpha, int beta, int depth) {
 		runningStatistics.expandedNodes++;
 		updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
-			double value = Double.NEGATIVE_INFINITY;
+			int value = Integer.MIN_VALUE;
 			for (A action : game.getActions(state)) {
 				S newState = game.getResult(state, action);
 				if(graphOptimization) {
@@ -150,13 +150,13 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	}
 
 	// returns an utility value
-	public double minValue(S state, P player, double alpha, double beta, int depth) {
+	public int minValue(S state, P player, int alpha, int beta, int depth) {
 		runningStatistics.expandedNodes++;
 		updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
-			double value = Double.POSITIVE_INFINITY;
+			int value = Integer.MAX_VALUE;
 			for (A action : game.getActions(state)) {
 				S newState = game.getResult(state, action);
 				if(graphOptimization) {
@@ -179,7 +179,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	}
 	
 	//@Override
-	protected double eval(S state, P player) {
+	protected int eval(S state, P player) {
 		//System.out.println(game.isTerminal(state));
 		if (!game.isTerminal(state)) heuristicEvaluationUsed = true;
 		//System.out.println("HF: "+heuristicEvaluationUsed);
