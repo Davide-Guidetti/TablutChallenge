@@ -169,7 +169,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	// returns an utility value
 	public double maxValue(S state, P player, double alpha, double beta, int depth) {
 		runningStatistics.expandedNodes++;
-		updateMetrics(depth);
+		//updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
@@ -201,7 +201,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	// returns an utility value
 	public double minValue(S state, P player, double alpha, double beta, int depth) {
 		runningStatistics.expandedNodes++;
-		updateMetrics(depth);
+		//updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
