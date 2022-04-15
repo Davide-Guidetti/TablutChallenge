@@ -19,8 +19,8 @@ class TestGameEvolution {
 
 	@Test
 	void test() {
-		int timeout = 10;
-		int maxDepth = 10;
+		int timeout = 10000;
+		int maxDepth = 4;
 		
 		GameDaloTablut rulesBlack;
 		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyBlack;
@@ -30,13 +30,13 @@ class TestGameEvolution {
 		// ------------- RECORD EVOLUTION WITHOUT USING OPTIMIZATION --------------
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
 		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesBlack, 0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
-		searchStrategyBlack.printStatistics=true;
+		searchStrategyBlack.printStatistics=false;
 		searchStrategyBlack.graphOptimization=false;
 		searchStrategyBlack.maxDepth = maxDepth;
 		
 		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
 		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesWhite, 0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
-		searchStrategyWhite.printStatistics=true;
+		searchStrategyWhite.printStatistics=false;
 		searchStrategyWhite.graphOptimization=false;
 		searchStrategyWhite.maxDepth = maxDepth;
 		
