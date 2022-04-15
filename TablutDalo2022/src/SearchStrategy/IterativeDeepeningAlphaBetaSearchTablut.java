@@ -29,9 +29,11 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 	HashSet<S> expandedStates = new HashSet<>();
 	
 	private Timer timer;
-	public boolean timedOut; //algorithm stopped search because of timeout
 	public Statistics statistics;
 	protected Statistics runningStatistics;
+	
+	public boolean timedOut; //algorithm stopped search because of timeout
+	public boolean outOfMemoryOccurred;
 	
 	public boolean logEnabled = false;
 	public boolean printStatistics = false;
@@ -55,6 +57,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 		List<A> results = game.getActions(state);
 		timer.start();
 		timedOut = false;
+		outOfMemoryOccurred = false;
 		currDepthLimit = 0;
 		metrics = new Metrics();
 		do {
@@ -65,22 +68,36 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 			runningStatistics.reachedDepth = currDepthLimit;
 			ActionStore<A> newResults = new ActionStore<>();
 			expandedStates.clear();
+			System.gc();
 			for (A action : results) {
-				double value = minValue(
-						(logEnabled) ? logExpansion(
-									game.getResult(state, action), 
-									action,
-									player,
-									logText
-							) : game.getResult(state, action),
-						player, 
-						Double.NEGATIVE_INFINITY, 
-						Double.POSITIVE_INFINITY, 
-						1
-				);
-				if (timer.timeOutOccurred()) break; // exit from action loop
-				newResults.add(action, value);
-				if (logEnabled) logText.append("value for top level action " + action + " = " + value + " \n");
+				try {
+					S newState = game.getResult(state, action);
+					if(graphOptimization) {
+						if(expandedStates.add(newState)==false) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+							//expandedStates.remove(newState);
+							runningStatistics.skippedSameNodes++;
+							continue;
+						}
+					}
+					double value = minValue(
+							(logEnabled) ? logExpansion(
+										newState, 
+										action,
+										player,
+										logText
+								) : game.getResult(state, action),
+							player, 
+							Double.NEGATIVE_INFINITY, 
+							Double.POSITIVE_INFINITY, 
+							1
+					);
+					if (timer.timeOutOccurred()) break; // exit from action loop
+					newResults.add(action, value);
+					if (logEnabled) logText.append("value for top level action " + action + " = " + value + " \n");
+				} catch(OutOfMemoryError e) {
+					outOfMemoryOccurred = true;
+					break;
+				}
 			}
 			if (newResults.size() > 0) {
 				results = newResults.actions;
@@ -96,7 +113,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 		} while (                           //exit if:
 				!timer.timeOutOccurred() && //time elapse OR
 				heuristicEvaluationUsed &&  //heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
-				currDepthLimit < maxDepth   //currentDepth reached maxDepth
+				currDepthLimit < maxDepth &&//currentDepth reached maxDepth
+				!outOfMemoryOccurred  //ram not sufficient
 		);
 		if(timer.timeOutOccurred()) timedOut=true;
 		return results.get(0);
@@ -113,7 +131,11 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 			for (A action : game.getActions(state)) {
 				S newState = game.getResult(state, action);
 				if(graphOptimization) {
-					if(expandedStates.add(newState)==false) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+					boolean jump = false;
+					if(depth<=2) jump = expandedStates.add(newState)==false;
+					else jump = expandedStates.contains(newState)==true;
+					if(jump) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+						//expandedStates.remove(newState);
 						runningStatistics.skippedSameNodes++;
 						continue;
 					}
@@ -138,7 +160,11 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P> /*extends Iterativ
 			for (A action : game.getActions(state)) {
 				S newState = game.getResult(state, action);
 				if(graphOptimization) {
-					if(expandedStates.add(newState)==false) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+					boolean jump = false;
+					if(depth<=2) jump = expandedStates.add(newState)==false;
+					else jump = expandedStates.contains(newState)==true;
+					if(jump) { //this state has already been expanded by the same player, and so previously evaluated. Continue with the next move
+						//expandedStates.remove(newState);
 						runningStatistics.skippedSameNodes++;
 						continue;
 					}
