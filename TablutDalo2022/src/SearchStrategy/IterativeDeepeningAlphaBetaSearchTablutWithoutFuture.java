@@ -15,41 +15,12 @@ import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
 public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
-		/* extends IterativeDeepeningAlphaBetaSearch<S, A, P> */ implements AdversarialSearch<S, A> {
+		extends IterativeDeepeningAlphaBetaSearchTablut<S, A, P> implements AdversarialSearch<S, A> {
 
-	public final static String METRICS_NODES_EXPANDED = "nodesExpanded";
-	public final static String METRICS_MAX_DEPTH = "maxDepth";
-	protected Metrics metrics = new Metrics();
-
-	protected Game<S, A, P> game;
-	protected double utilMax;
-	protected double utilMin;
-	protected int currDepthLimit;
-	protected boolean heuristicEvaluationUsed; // indicates that non-terminal nodes have been evaluated.
-
-	public boolean graphOptimization = true; // keeps references to expanded states, in order to check if the same state
-												// has already been expanded
 	HashSet<S> expandedStates = new HashSet<>();
 
-	private Timer timer;
-	public Statistics statistics;
-	protected Statistics runningStatistics;
-
-	public boolean timedOut; // algorithm stopped search because of timeout
-	public boolean outOfMemoryOccurred;
-
-	public boolean logEnabled = false;
-	public boolean printStatistics = false;
-	public int maxDepth = Integer.MAX_VALUE;
-
-	public IterativeDeepeningAlphaBetaSearchTablutWithoutFuture(Game<S, A, P> game, double utilMin, double utilMax,
-			int time) {
-		// super(game, utilMin, utilMax, time);
-		this.game = game;
-		this.utilMin = utilMin;
-		this.utilMax = utilMax;
-		this.timer = new Timer(time);
-		this.statistics = new Statistics();
+	public IterativeDeepeningAlphaBetaSearchTablutWithoutFuture(Game<S, A, P> game, double utilMin, double utilMax, int time) {
+		super(game, utilMin, utilMax, time);
 	}
 
 	@Override
@@ -217,62 +188,5 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 	@Override
 	public Metrics getMetrics() {
 		return metrics;
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////
-	// nested helper classes
-
-	private static class Timer {
-		private long duration;
-		private long startTime;
-
-		Timer(int maxSeconds) {
-			this.duration = 1000 * maxSeconds;
-		}
-
-		void start() {
-			startTime = System.currentTimeMillis();
-		}
-
-		boolean timeOutOccurred() {
-			return System.currentTimeMillis() > startTime + duration;
-		}
-	}
-
-	/**
-	 * Orders actions by utility.
-	 */
-	private static class ActionStore<A> {
-		private List<A> actions = new ArrayList<>();
-		private List<Double> utilValues = new ArrayList<>();
-
-		void add(A action, double utilValue) {
-			int idx = 0;
-			while (idx < actions.size() && utilValue <= utilValues.get(idx))
-				idx++;
-			actions.add(idx, action);
-			utilValues.add(idx, utilValue);
-		}
-
-		int size() {
-			return actions.size();
-		}
-	}
-
-	public static class Statistics {
-		public long expandedNodes;
-		public long reachedDepth;
-		public long skippedSameNodes;
-
-		public Statistics() {
-			expandedNodes = 0;
-			reachedDepth = 0;
-			skippedSameNodes = 0;
-		}
-
-		public String toString() {
-			return "SEARCH STATISTICS:\n" + "expandedNodes: " + expandedNodes + "\n" + "skippedSameNodes: "
-					+ skippedSameNodes + "\n" + "reachedDepth: " + reachedDepth + "\n";
-		}
 	}
 }

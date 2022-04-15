@@ -1,10 +1,13 @@
 package SearchStrategy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,9 +36,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 
 	public boolean graphOptimization = true; // keeps references to expanded states, in order to check if the same state
 												// has already been expanded
-	HashSet<S> expandedStates = new HashSet<>();
+	ConcurrentMap<Integer, S> expandedStates = new ConcurrentHashMap<>();
 
-	private Timer timer;
+	protected Timer timer;
 	public Statistics statistics;
 	protected Statistics runningStatistics;
 
@@ -86,10 +89,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				try {
 					S newState = game.getResult(state, action);
 					if (graphOptimization) {
-						if (expandedStates.add(newState) == false) { // this state has already been expanded by the same
+						if (expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null) { // this state has already been expanded by the same
 																		// player, and so previously evaluated. Continue
 																		// with the next move
-							// expandedStates.remove(newState);
 							runningStatistics.skippedSameNodes++;
 							continue;
 						}
@@ -122,7 +124,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				}
 
 				if (timer.timeOutOccurred()) {
-					//System.out.println("Timeout");
+					// System.out.println("Timeout");
 					break;
 				}
 
@@ -169,7 +171,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	// returns an utility value
 	public double maxValue(S state, P player, double alpha, double beta, int depth) {
 		runningStatistics.expandedNodes++;
-		//updateMetrics(depth);
+		// updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
@@ -179,9 +181,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				if (graphOptimization) {
 					boolean jump = false;
 					if (depth <= 2)
-						jump = expandedStates.add(newState) == false;
+						jump = expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null;
 					else
-						jump = expandedStates.contains(newState) == true;
+						jump = expandedStates.get(Integer.valueOf(newState.hashCode())) != null;
 					if (jump) { // this state has already been expanded by the same player, and so previously
 								// evaluated. Continue with the next move
 						// expandedStates.remove(newState);
@@ -201,7 +203,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	// returns an utility value
 	public double minValue(S state, P player, double alpha, double beta, int depth) {
 		runningStatistics.expandedNodes++;
-		//updateMetrics(depth);
+		// updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
 			return eval(state, player);
 		} else {
@@ -211,9 +213,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				if (graphOptimization) {
 					boolean jump = false;
 					if (depth <= 2)
-						jump = expandedStates.add(newState) == false;
+						jump = expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null;
 					else
-						jump = expandedStates.contains(newState) == true;
+						jump = expandedStates.get(Integer.valueOf(newState.hashCode())) != null;
 					if (jump) { // this state has already been expanded by the same player, and so previously
 								// evaluated. Continue with the next move
 						// expandedStates.remove(newState);
@@ -257,7 +259,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	///////////////////////////////////////////////////////////////////////////////////////////
 	// nested helper classes
 
-	private static class Timer {
+	public static class Timer {
 		private long duration;
 		private long startTime;
 
@@ -277,9 +279,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	/**
 	 * Orders actions by utility.
 	 */
-	private static class ActionStore<A> {
-		private List<A> actions = new ArrayList<>();
-		private List<Double> utilValues = new ArrayList<>();
+	public static class ActionStore<A> {
+		protected List<A> actions = new ArrayList<>();
+		protected List<Double> utilValues = new ArrayList<>();
 
 		void add(A action, double utilValue) {
 			int idx = 0;

@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut;
+import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablutWithoutFuture;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
@@ -18,25 +19,25 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 class TestGameEvolution {
 
 	@Test
-	void test() {
+	void test_no_cuncurrent() {
 		int timeout = 10;
 		int maxDepth = 6;
 		
 		GameDaloTablut rulesBlack;
-		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyBlack;
+		IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<State, Action, String> searchStrategyBlack;
 		GameDaloTablut rulesWhite;
-		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyWhite;
+		IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<State, Action, String> searchStrategyWhite;
 		
 		// ------------- RECORD EVOLUTION WITHOUT USING OPTIMIZATION --------------
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
-		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
 		searchStrategyBlack.logEnabled=true;
 		searchStrategyBlack.printStatistics=true;
 		searchStrategyBlack.graphOptimization=false;
 		searchStrategyBlack.maxDepth = maxDepth;
 		
 		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
-		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
 		searchStrategyWhite.printStatistics=false;
 		searchStrategyWhite.graphOptimization=false;
 		searchStrategyWhite.maxDepth = maxDepth;
@@ -48,13 +49,13 @@ class TestGameEvolution {
 		
 		// ----------------- RECORD EVOLUTION USING OPTIMIZATION ------------------
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
-		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
 		searchStrategyBlack.printStatistics=true;
 		searchStrategyBlack.graphOptimization=true;
 		searchStrategyBlack.maxDepth = maxDepth;
 		
 		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
-		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
 		searchStrategyWhite.printStatistics=true;
 		searchStrategyWhite.graphOptimization=true;
 		searchStrategyWhite.maxDepth = maxDepth;
@@ -71,6 +72,62 @@ class TestGameEvolution {
 		System.out.println();
 		assertEquals(withOptimization, withoutOptimization);
 	}
+	
+	
+	@Test
+	void test_cuncurrent() {
+		int timeout = 10;
+		int maxDepth = 6;
+		
+		GameDaloTablut rulesBlack;
+		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyBlack;
+		GameDaloTablut rulesWhite;
+		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyWhite;
+		
+		// ------------- RECORD EVOLUTION NO CONCURRENCY WITH OPTIMIZATION --------------
+		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
+		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyBlack.logEnabled=true;
+		searchStrategyBlack.printStatistics=true;
+		searchStrategyBlack.graphOptimization=true;
+		searchStrategyBlack.maxDepth = maxDepth;
+		
+		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
+		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyWhite.printStatistics=false;
+		searchStrategyWhite.graphOptimization=true;
+		searchStrategyWhite.maxDepth = maxDepth;
+		
+		long withoutOptimizationStartTime = System.currentTimeMillis();
+		List<Action> withoutOptimization = gameEvolution(rulesWhite, rulesBlack, searchStrategyWhite, searchStrategyBlack);
+		long withoutOptimizationEndTime = System.currentTimeMillis();
+		
+		// ----------------- RECORD EVOLUTION WITH CONCURRENCY USING OPTIMIZATION ------------------
+		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
+		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesBlack, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyBlack.printStatistics=true;
+		searchStrategyBlack.graphOptimization=true;
+		searchStrategyBlack.maxDepth = maxDepth;
+		
+		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
+		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablut<>(rulesWhite, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout  - 1);
+		searchStrategyWhite.printStatistics=false;
+		searchStrategyWhite.graphOptimization=true;
+		searchStrategyWhite.maxDepth = maxDepth;
+		
+		long withOptimizationStartTime = System.currentTimeMillis();
+		List<Action> withOptimization = gameEvolution(rulesWhite, rulesBlack, searchStrategyWhite, searchStrategyBlack);
+		long withOptimizationEndTime = System.currentTimeMillis();
+		
+		System.out.println("Without optimization: (" + (withoutOptimizationEndTime-withoutOptimizationStartTime)/1000 + "s)");
+		System.out.println(withoutOptimization);
+		System.out.println();
+		System.out.println("With optimization: (" + (withOptimizationEndTime-withOptimizationStartTime)/1000 + "s)");
+		System.out.println(withOptimization);
+		System.out.println();
+		assertEquals(withOptimization, withoutOptimization);
+	}
+	
 	
 	
 	public static List<Action> gameEvolution(
