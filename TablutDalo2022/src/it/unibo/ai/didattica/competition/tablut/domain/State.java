@@ -2,6 +2,7 @@ package it.unibo.ai.didattica.competition.tablut.domain;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -197,9 +198,17 @@ public abstract class State {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((this.board == null) ? 0 : this.board.hashCode());
+		result = prime * result + ((this.board == null) ? 0 : deepHashCode(board));
 		result = prime * result + ((this.turn == null) ? 0 : this.turn.hashCode());
 		return result;
+	}
+	
+	private static <T> int deepHashCode(T[][] matrix) {
+		int tmp[] = new int[matrix.length];
+		for (int i = 0; i < matrix.length; i++) {
+			tmp[i] = Arrays.hashCode(matrix[i]);
+		}
+		return Arrays.hashCode(tmp);
 	}
 
 	public static String getBox(int row, int column) {
