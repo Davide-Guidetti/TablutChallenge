@@ -1,14 +1,10 @@
+
 package SearchStrategy;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import aima.core.search.adversarial.AdversarialSearch;
 import aima.core.search.adversarial.Game;
@@ -18,7 +14,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 
-public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
+public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 		/* extends IterativeDeepeningAlphaBetaSearch<S, A, P> */ implements AdversarialSearch<S, A> {
 
 	public final static String METRICS_NODES_EXPANDED = "nodesExpanded";
@@ -46,17 +42,14 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	public boolean printStatistics = false;
 	public int maxDepth = Integer.MAX_VALUE;
 
-	private final ExecutorService executor; // futures multi thread
-
-	public IterativeDeepeningAlphaBetaSearchTablut(Game<S, A, P> game, double utilMin, double utilMax, int time) {
+	public IterativeDeepeningAlphaBetaSearchTablutWithoutFuture(Game<S, A, P> game, double utilMin, double utilMax,
+			int time) {
 		// super(game, utilMin, utilMax, time);
 		this.game = game;
 		this.utilMin = utilMin;
 		this.utilMax = utilMax;
 		this.timer = new Timer(time);
 		this.statistics = new Statistics();
-		// define executor
-		executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
 
 	@Override
@@ -69,10 +62,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		outOfMemoryOccurred = false;
 		currDepthLimit = 0;
 		metrics = new Metrics();
-		ArrayList<Future<Double>> futureValue;
 		do {
 			currDepthLimit++;
-			futureValue = new ArrayList<>(results.size());
 			if (logEnabled)
 				logText = new StringBuffer("Starting search up to depth " + currDepthLimit + "\n");
 			heuristicEvaluationUsed = false;
@@ -94,46 +85,20 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 							continue;
 						}
 					}
-					Callable<Double> callable = () -> {
-						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY,
-								Double.POSITIVE_INFINITY, 1);
-						return value;
-					};
-					futureValue.add(executor.submit(callable));
-
+					double value = minValue(
+							(logEnabled) ? logExpansion(newState, action, player, logText)
+									: game.getResult(state, action),
+							player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1);
 					if (timer.timeOutOccurred())
 						break; // exit from action loop
-					// newResults.add(action, value);
-					// if (logEnabled) logText.append("value for top level action " + action + " = "
-					// + value + " \n");
+					newResults.add(action, value);
+					if (logEnabled)
+						logText.append("value for top level action " + action + " = " + value + " \n");
 				} catch (OutOfMemoryError e) {
 					outOfMemoryOccurred = true;
 					break;
 				}
 			}
-			for (int i = 0; i < results.size(); i++) {
-				try {
-					A actionResult = results.get(i);
-					double heuristicValue = futureValue.get(i).get();
-					newResults.add(actionResult, heuristicValue);
-
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				}
-
-				if (timer.timeOutOccurred()) {
-					//System.out.println("Timeout");
-					break;
-				}
-
-			}
-
-			for (int i = 0; i < results.size(); i++) {
-				if (!futureValue.get(i).isDone()) {
-					futureValue.get(i).cancel(true);
-				}
-			}
-
 			long endTime = System.currentTimeMillis();
 			System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
 			if (newResults.size() > 0) {

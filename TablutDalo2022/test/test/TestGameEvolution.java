@@ -19,8 +19,8 @@ class TestGameEvolution {
 
 	@Test
 	void test() {
-		int timeout = 10000;
-		int maxDepth = 4;
+		int timeout = 10;
+		int maxDepth = 6;
 		
 		GameDaloTablut rulesBlack;
 		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategyBlack;
