@@ -86,16 +86,13 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			System.gc();
 			long startTime = System.currentTimeMillis();
 			for (A action : results) {
+				S newState = game.getResult(state, action);
+				if (graphOptimization) {
+					expandedStates.put(Integer.valueOf(newState.hashCode()), newState);
+				}
+			}
+			for (A action : results) {
 				try {
-					S newState = game.getResult(state, action);
-					if (graphOptimization) {
-						if (expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null) { // this state has already been expanded by the same
-																		// player, and so previously evaluated. Continue
-																		// with the next move
-							runningStatistics.skippedSameNodes++;
-							continue;
-						}
-					}
 					Callable<Double> callable = () -> {
 						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY,
 								Double.POSITIVE_INFINITY, 1);
@@ -105,9 +102,6 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 
 					if (timer.timeOutOccurred())
 						break; // exit from action loop
-					// newResults.add(action, value);
-					// if (logEnabled) logText.append("value for top level action " + action + " = "
-					// + value + " \n");
 				} catch (OutOfMemoryError e) {
 					outOfMemoryOccurred = true;
 					break;
@@ -145,9 +139,6 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
 									+ " (max possible value: " + GameDaloTablut.getMaxValueHeuristic() + ")\n");
 			} else {
-				// TODO
-				// maybe choose a random correct action by generatig all of them and returning
-				// the first feasible one by checking it with prof's checkmove
 				if (logEnabled)
 					logText.append("No action to chose from");
 			}
