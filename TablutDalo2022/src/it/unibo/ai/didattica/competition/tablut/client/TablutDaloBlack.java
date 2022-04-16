@@ -30,9 +30,9 @@ public class TablutDaloBlack extends TablutClient {
 		String ipAddress;
 		if (args.length != 3) {
 			System.out.println("Errore args: <role> <timeout> <ipAddress>");
-			System.out.println("Default Setting:\nrole: white\ntimeout=60 sec\nipAddress=\"Localhost\"");
+			System.out.println("Default Setting:\nrole: white\ntimeout=10 sec\nipAddress=\"Localhost\"");
 			role = "black";
-			timeout = 60;
+			timeout = 10;
 			ipAddress = "localhost";
 		} else {
 			role = args[0];

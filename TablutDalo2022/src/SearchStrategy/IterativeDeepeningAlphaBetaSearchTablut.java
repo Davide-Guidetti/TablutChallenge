@@ -31,7 +31,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	protected int currDepthLimit;
 	protected boolean heuristicEvaluationUsed; // indicates that non-terminal nodes have been evaluated.
 
-	public boolean graphOptimization = true; // keeps references to expanded states, in order to check if the same state
+	public boolean graphOptimization = false; // keeps references to expanded states, in order to check if the same state
 												// has already been expanded
 	HashSet<S> expandedStates = new HashSet<>();
 
