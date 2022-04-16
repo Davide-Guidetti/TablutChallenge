@@ -85,7 +85,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			for (A action : results) {
 				try {
 					S newState = game.getResult(state, action);
-					if (graphOptimization) {
+					/*if (graphOptimization) {
 						if (expandedStates.add(newState) == false) { // this state has already been expanded by the same
 																		// player, and so previously evaluated. Continue
 																		// with the next move
@@ -93,7 +93,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 							runningStatistics.skippedSameNodes++;
 							continue;
 						}
-					}
+					}*/
 					Callable<Double> callable = () -> {
 						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY,
 								Double.POSITIVE_INFINITY, 1);
@@ -103,9 +103,6 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 
 					if (timer.timeOutOccurred())
 						break; // exit from action loop
-					// newResults.add(action, value);
-					// if (logEnabled) logText.append("value for top level action " + action + " = "
-					// + value + " \n");
 				} catch (OutOfMemoryError e) {
 					outOfMemoryOccurred = true;
 					break;
@@ -128,14 +125,14 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 
 			}
 
-			for (int i = 0; i < results.size(); i++) {
+			for (int i = 0; i < futureValue.size(); i++) {
 				if (!futureValue.get(i).isDone()) {
 					futureValue.get(i).cancel(true);
 				}
 			}
 
 			long endTime = System.currentTimeMillis();
-			System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
+			//System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
 			if (newResults.size() > 0) {
 				results = newResults.actions;
 				if (logEnabled)
