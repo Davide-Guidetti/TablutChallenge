@@ -18,11 +18,10 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
-class TestAlgorithm {
+class TestAlgorithmConcurrent {
 	
 	Turn currentTurn = Turn.WHITE;
-	Game<State, Action, String> rules;
-	IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
+	IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy1, searchStrategy2;
 	
 	@Test
 	void testKingEscape() {
@@ -52,21 +51,13 @@ class TestAlgorithm {
 		// ----------- PLACEMENT DONE --------------
 		state.setBoard(board);
 		
-		constructObjects(true);
-		searchStrategy.maxDepth = 1;
-		
-		System.out.println("finding action for state");
+		System.out.println("Evaluating state");
 		System.out.println(state.boardStringWithCellIndex());
 		System.out.println();
 		
-		//EXPECTED BEHAVIOUR: king escapes going from 4,2 to 0,2
-		Action chosenAction = searchStrategy.makeDecision(state);
-		try {
-			assertEquals(new Action(4,2,0,2,currentTurn), chosenAction);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail();
-		}
+		copare_NoConcurrentNoGraph_ConcurrentNoGraph(state);
+		copare_NoConcurrentNoGraph_NoConcurrentGraph(state);
+		copare_NoConcurrentNoGraph_ConcurrentGraph(state);
 	}
 	
 	@Test
@@ -101,36 +92,75 @@ class TestAlgorithm {
 		// ----------- PLACEMENT DONE --------------
 		state.setBoard(board);
 		
-		constructObjects(true);
-		searchStrategy.maxDepth = 1;
-		
-		System.out.println("finding action for state");
+		System.out.println("Evaluating state");
 		System.out.println(state.boardStringWithCellIndex());
 		System.out.println();
 		
-		Action chosenAction = searchStrategy.makeDecision(state);
-		
-		//EXPECTED BEHAVIOUR: black from 0,5 eats king gointo to 3,5
-		try {
-			assertEquals(new Action(0,5,3,5,currentTurn), chosenAction);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail();
-		}
+		copare_NoConcurrentNoGraph_ConcurrentNoGraph(state);
+		copare_NoConcurrentNoGraph_NoConcurrentGraph(state);
+		copare_NoConcurrentNoGraph_ConcurrentGraph(state);
 	}
-
 	
 	
 	
 	
 	
+	private void copare_NoConcurrentNoGraph_ConcurrentNoGraph(State state) {
+		searchStrategy1 = constructSrategy(false,false); //basic (noConcurrentNoGraph)
+		searchStrategy2 = constructSrategy(true,false); //concurrent no graph
+		assertTrue(testIfStrategiesFindSameUtility(state, searchStrategy1, searchStrategy2, 3));
+	}
+	
+	private void copare_NoConcurrentNoGraph_NoConcurrentGraph(State state) {
+		searchStrategy1 = constructSrategy(false,false); //basic (noConcurrentNoGraph)
+		searchStrategy2 = constructSrategy(false,true); //(no concurrent) with graph
+		assertTrue(testIfStrategiesFindSameUtility(state, searchStrategy1, searchStrategy2, 3));
+	}
+	
+	private void copare_NoConcurrentNoGraph_ConcurrentGraph(State state) {
+		searchStrategy1 = constructSrategy(false,false); //basic (noConcurrentNoGraph)
+		searchStrategy2 = constructSrategy(true,true); //concurrent with graph
+		assertTrue(testIfStrategiesFindSameUtility(state, searchStrategy1, searchStrategy2, 3));
+	}
 	
 	
+	/**
+	 * Test whether or not the two expansion strategies find a new state with the same utility. 
+	 * If not the method returns false, meaning that one of the 2 strategies is bloken, since it failed to find (one of) the best move
+	 * @param intialState the initial state the expansion starts from
+	 * @param searchStrategy1 algorithm 1
+	 * @param searchStrategy2 algorithm 2
+	 * @param depth expand until this depth (taking all the necessary time to do that.. see apiNotes)
+	 * @apiNote make sure that both strategie take their time to expand all the states up to a prefixed depth, 
+	 * otherwise it's (correctly) possible that they find an action with a different utility
+	 */
+	private boolean testIfStrategiesFindSameUtility(
+		State intialState,
+		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy1,
+		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy2,
+		int depth
+	) {
+		searchStrategy1.setMaxTime(10000);
+		searchStrategy2.setMaxTime(10000);
+		searchStrategy1.maxDepth = depth;
+		searchStrategy2.maxDepth = depth;
+		searchStrategy1.makeDecision(intialState);
+		searchStrategy2.makeDecision(intialState);
+		double Utility1 = searchStrategy1.getLastResultsUtilities().get(0);
+		double Utility2 = searchStrategy2.getLastResultsUtilities().get(0);
+		if(Utility1!=Utility2) {
+			System.err.println("Utility1 = " + Utility1 + "; " + "Utility2 = " + Utility2);
+			return false;
+		}else {
+			System.out.println("Both strategies gave value " + Utility1);
+		}
+		return true;
+	}
 	
 	
-	
-	private void constructObjects(boolean concurrent) {
-		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
+	private IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> constructSrategy(boolean concurrent, boolean graphOprimization) {
+		Game<State, Action, String> rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", Turn.WHITE);
+		IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchStrategy;
 		if(concurrent) {
 			searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<State, Action, String>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), 60){
 				@Override
@@ -170,9 +200,10 @@ class TestAlgorithm {
 				}
 			};
 		}
-		
 		searchStrategy.printStatistics = true;
-		searchStrategy.logEnabled = true;
+		searchStrategy.logEnabled = false;
+		searchStrategy.graphOptimization = graphOprimization;
+		return searchStrategy;
 	}
 
 }

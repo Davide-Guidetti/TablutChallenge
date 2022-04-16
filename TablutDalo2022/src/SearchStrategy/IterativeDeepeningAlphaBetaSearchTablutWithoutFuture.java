@@ -27,7 +27,7 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 	public A makeDecision(S state) {
 		StringBuffer logText = null;
 		P player = game.getPlayer(state);
-		List<A> results = game.getActions(state);
+		results = game.getActions(state);
 		timer.start();
 		timedOut = false;
 		outOfMemoryOccurred = false;
@@ -43,7 +43,7 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 			ActionStore<A> newResults = new ActionStore<>();
 			expandedStates.clear();
 			System.gc();
-			long startTime = System.currentTimeMillis();
+			//long startTime = System.currentTimeMillis();
 			for (A action : results) {
 				try {
 					S newState = game.getResult(state, action);
@@ -70,10 +70,11 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 					break;
 				}
 			}
-			long endTime = System.currentTimeMillis();
-			System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
+			//long endTime = System.currentTimeMillis();
+			//System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
 			if (newResults.size() > 0) {
 				results = newResults.actions;
+				utilities = newResults.utilValues;
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
@@ -91,9 +92,8 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 			if (printStatistics)
 				System.out.println(statistics);
 		} while ( // exit if:
-		!timer.timeOutOccurred() && // time elapse OR
-				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth
-											// has been reacked OR
+				!timer.timeOutOccurred() && // time elapse OR
+				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
 				currDepthLimit < maxDepth && // currentDepth reached maxDepth
 				!outOfMemoryOccurred // ram not sufficient
 		);

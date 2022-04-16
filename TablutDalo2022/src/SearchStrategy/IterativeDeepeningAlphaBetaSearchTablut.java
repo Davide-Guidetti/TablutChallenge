@@ -50,6 +50,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	public int maxDepth = Integer.MAX_VALUE;
 
 	private final ExecutorService executor; // futures multi thread
+	
+	List<A> results;
+	List<Double> utilities;
 
 	public IterativeDeepeningAlphaBetaSearchTablut(Game<S, A, P> game, double utilMin, double utilMax, int time) {
 		// super(game, utilMin, utilMax, time);
@@ -61,12 +64,16 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		// define executor
 		executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
-
+	
+	public void setMaxTime(int time) {
+		this.timer = new Timer(time);
+	}
+	
 	@Override
 	public A makeDecision(S state) {
 		StringBuffer logText = null;
 		P player = game.getPlayer(state);
-		List<A> results = game.getActions(state);
+		results = game.getActions(state);
 		timer.start();
 		timedOut = false;
 		outOfMemoryOccurred = false;
@@ -84,24 +91,20 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			ActionStore<A> newResults = new ActionStore<>();
 			expandedStates.clear();
 			System.gc();
-			long startTime = System.currentTimeMillis();
-			for (A action : results) {
+			//long startTime = System.currentTimeMillis();
+			for (A action : results) {  //initial move generate states all different form each other: add them to the expanded states list
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					expandedStates.put(Integer.valueOf(newState.hashCode()), newState);
 				}
 			}
-			for (A action : results) {
+			for (A action : results) {  //launch minMax evaluation on each possible action
 				try {
 					Callable<Double> callable = () -> {
-						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY,
-								Double.POSITIVE_INFINITY, 1);
+						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1);
 						return value;
 					};
 					futureValue.add(executor.submit(callable));
-
-					if (timer.timeOutOccurred())
-						break; // exit from action loop
 				} catch (OutOfMemoryError e) {
 					outOfMemoryOccurred = true;
 					break;
@@ -110,30 +113,26 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			for (int i = 0; i < results.size(); i++) {
 				try {
 					A actionResult = results.get(i);
-					double heuristicValue = futureValue.get(i).get();
+					double heuristicValue = futureValue.get(i).get(); //that is blocking, but threads also checks for timeout, so they terminate fast in case of timeout
 					newResults.add(actionResult, heuristicValue);
-
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();
 				}
-
-				if (timer.timeOutOccurred()) {
-					// System.out.println("Timeout");
+				if (timer.timeOutOccurred()) { //the expansion up to this depth is not complete, so we skip getting the results
 					break;
 				}
-
 			}
-
-			for (int i = 0; i < results.size(); i++) {
+			for (int i = 0; i < results.size(); i++) { //make sure to kill any remaining running thread
 				if (!futureValue.get(i).isDone()) {
 					futureValue.get(i).cancel(true);
 				}
 			}
 
-			long endTime = System.currentTimeMillis();
-			System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
+			//long endTime = System.currentTimeMillis();
+			//System.out.println("Elapsed Time: " + (endTime - startTime) + "\n");
 			if (newResults.size() > 0) {
 				results = newResults.actions;
+				utilities = newResults.utilValues;
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
@@ -148,15 +147,21 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			if (printStatistics)
 				System.out.println(statistics);
 		} while ( // exit if:
-		!timer.timeOutOccurred() && // time elapse OR
-				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth
-											// has been reacked OR
+				!timer.timeOutOccurred() && // time elapse OR
+				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
 				currDepthLimit < maxDepth && // currentDepth reached maxDepth
 				!outOfMemoryOccurred // ram not sufficient
 		);
 		if (timer.timeOutOccurred())
 			timedOut = true;
 		return results.get(0);
+	}
+
+	public List<A> getLastResults() {
+		return results;
+	}
+	public List<Double> getLastResultsUtilities() {
+		return utilities;
 	}
 
 	// returns an utility value
