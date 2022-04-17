@@ -14,52 +14,117 @@ import java.util.List;
  */
 public abstract class State {
 
-	/**
-	 * Turn represent the player that has to move or the end of the game(A win
-	 * by a player or a draw)
-	 *
-	 * @author A.Piretti
-	 */
 	public enum Turn {
-		WHITE("W"), BLACK("B"), WHITEWIN("WW"), BLACKWIN("BW"), DRAW("D");
-		private final String turn;
+		WHITE((byte) 0), BLACK((byte) 1), WHITEWIN((byte) 2), BLACKWIN((byte) 3), DRAW((byte) 4);
+
+		private final byte turn;
 
 		private Turn(String s) {
-			turn = s;
+			if (s.equals("W")) {
+				turn = (byte) 0;
+			} else if (s.equals("B")) {
+				turn = (byte) 1;
+			} else if (s.equals("WW")) {
+				turn = (byte) 2;
+			} else if (s.equals("BW")) {
+				turn = (byte) 3;
+			} else if (s.equals("D")) {
+				turn = (byte) 4;
+			} else {
+				turn = (byte) 0;
+			}
+		}
+
+		private Turn(byte b) {
+			turn = b;
 		}
 
 		public boolean equalsTurn(String otherName) {
-			return (otherName == null) ? false : turn.equals(otherName);
+			if (otherName.equals("W") && turn == (byte) 0) {
+				return true;
+			} else if (otherName.equals("B") && turn == (byte) 1) {
+				return true;
+			} else if (otherName.equals("WW") && turn == (byte) 2) {
+				return true;
+			} else if (otherName.equals("BW") && turn == (byte) 3) {
+				return true;
+			} else if (otherName.equals("D") && turn == (byte) 4) {
+				return true;
+			}
+			return false;
 		}
 
 		@Override
 		public String toString() {
-			return turn;
+			if (turn == (byte) 0) {
+				return "W";
+			} else if (turn == (byte) 1) {
+				return "B";
+			} else if (turn == (byte) 2) {
+				return "WW";
+			} else if (turn == (byte) 3) {
+				return "BW";
+			} else if (turn == (byte) 4) {
+				return "D";
+			}
+			return null;
 		}
 	}
 
-	/**
-	 *
-	 * Pawn represents the content of a box in the board
-	 *
-	 * @author A.Piretti
-	 *
-	 */
 	public enum Pawn {
-		EMPTY("O"), WHITE("W"), BLACK("B"), THRONE("T"), KING("K");
-		private final String pawn;
+		EMPTY((byte) 0), WHITE((byte) 1), BLACK((byte) 2), THRONE((byte) 3), KING((byte) 4);
 
-		private Pawn(String s) {
+		private final byte pawn;
+
+		private Pawn (String s) {
+			if (s.equals("O")) {
+				pawn = (byte) 0;
+			} else if (s.equals("W")) {
+				pawn = (byte) 1;
+			} else if (s.equals("B")) {
+				pawn = (byte) 2;
+			} else if (s.equals("T")) {
+				pawn = (byte) 3;
+			} else if (s.equals("K")) {
+				pawn = (byte) 4;
+			} else {
+				pawn = (byte) 0;
+			}	
+		}
+		
+		private Pawn(byte s) {
 			pawn = s;
 		}
 
 		public boolean equalsPawn(String otherPawn) {
-			return (otherPawn == null) ? false : pawn.equals(otherPawn);
+			if (otherPawn.equals("O") && pawn == (byte) 0) {
+				return true;
+			} else if (otherPawn.equals("W") && pawn == (byte) 1) {
+				return true;
+			} else if (otherPawn.equals("B") && pawn == (byte) 2) {
+				return true;
+			} else if (otherPawn.equals("T") && pawn == (byte) 3) {
+				return true;
+			} else if (otherPawn.equals("K") && pawn == (byte) 4) {
+				return true;
+			}
+			return false;
 		}
 
 		@Override
 		public String toString() {
-			return pawn;
+			if (pawn == (byte) 0) {
+				return "O";
+			} else if (pawn == (byte) 1) {
+				return "W";
+			} else if (pawn == (byte) 2) {
+				return "B";
+			} else if (pawn == (byte) 3) {
+				return "T";
+			} else if (pawn == (byte) 4) {
+				return "K";
+			}
+			return null;
 		}
 
 	}
@@ -87,13 +152,13 @@ public abstract class State {
 		}
 		return result.toString();
 	}
-	
+
 	public String boardStringWithCellIndex() {
 		StringBuffer result = new StringBuffer();
 		result.append(" ABCDEFGHI\n");
-		for(int i=0; i<this.board.length; i++) {
-			result.append(i+1);
-			for(int j=0; j<this.board[0].length; j++) {
+		for (int i = 0; i < this.board.length; i++) {
+			result.append(i + 1);
+			for (int j = 0; j < this.board[0].length; j++) {
 				result.append(this.board[i][j].toString());
 			}
 			result.append("\n");
@@ -132,10 +197,8 @@ public abstract class State {
 	/**
 	 * this function tells the pawn inside a specific box on the board
 	 *
-	 * @param row
-	 *            represents the row of the specific box
-	 * @param column
-	 *            represents the column of the specific box
+	 * @param row    represents the row of the specific box
+	 * @param column represents the column of the specific box
 	 * @return is the pawn of the box
 	 */
 	public Pawn getPawn(int row, int column) {
@@ -145,10 +208,8 @@ public abstract class State {
 	/**
 	 * this function remove a specified pawn from the board
 	 *
-	 * @param row
-	 *            represents the row of the specific box
-	 * @param column
-	 *            represents the column of the specific box
+	 * @param row    represents the row of the specific box
+	 * @param column represents the column of the specific box
 	 *
 	 */
 	public void removePawn(int row, int column) {
@@ -202,7 +263,7 @@ public abstract class State {
 		result = prime * result + ((this.turn == null) ? 0 : this.turn.hashCode());
 		return result;
 	}
-	
+
 	private static <T> int deepHashCode(T[][] matrix) {
 		int tmp[] = new int[matrix.length];
 		for (int i = 0; i < matrix.length; i++) {
@@ -246,9 +307,13 @@ public abstract class State {
 	}
 
 	/**
-	 * Counts the number of checkers of a specific color on the board. Note: the king is not taken into account for white, it must be checked separately
-	 * @param color The color of the checker that will be counted. It is possible also to use EMPTY to count empty cells.
-	 * @return The number of cells of the board that contains a checker of that color.
+	 * Counts the number of checkers of a specific color on the board. Note: the
+	 * king is not taken into account for white, it must be checked separately
+	 * 
+	 * @param color The color of the checker that will be counted. It is possible
+	 *              also to use EMPTY to count empty cells.
+	 * @return The number of cells of the board that contains a checker of that
+	 *         color.
 	 */
 	public int getNumberOf(Pawn color) {
 		int count = 0;
@@ -260,11 +325,11 @@ public abstract class State {
 		}
 		return count;
 	}
-	
+
 	public abstract List<State> getDrawConditions();
 
 	public abstract void setDrawConditions(List<State> drawConditions);
-	
+
 	public abstract void clearDrawConditions();
 
 	public abstract int getMovesWithutCapturing();
