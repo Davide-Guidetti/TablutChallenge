@@ -18,6 +18,9 @@ import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
+/*
+ * Test if concurrent strategies gives different results compared to the one of the base strategy
+ */
 class TestAlgorithmConcurrent {
 	
 	Turn currentTurn = Turn.WHITE;

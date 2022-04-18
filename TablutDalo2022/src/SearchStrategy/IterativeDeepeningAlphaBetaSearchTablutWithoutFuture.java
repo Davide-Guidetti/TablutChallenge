@@ -75,6 +75,7 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 			if (newResults.size() > 0) {
 				results = newResults.actions;
 				utilities = newResults.utilValues;
+				runningStatistics.maxResultUtility = newResults.utilValues.get(0);
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
@@ -114,7 +115,7 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
-					if (depth <= 2)
+					if (depth <= RECORD_STATES_UP_TO_DEPTH)
 						jump = expandedStates.add(newState) == false;
 					else
 						jump = expandedStates.contains(newState) == true;
@@ -146,7 +147,7 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
-					if (depth <= 2)
+					if (depth <= RECORD_STATES_UP_TO_DEPTH)
 						jump = expandedStates.add(newState) == false;
 					else
 						jump = expandedStates.contains(newState) == true;

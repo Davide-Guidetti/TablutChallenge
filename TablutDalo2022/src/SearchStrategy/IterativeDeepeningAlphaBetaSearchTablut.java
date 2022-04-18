@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,7 +37,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 
 	public boolean graphOptimization = true; // keeps references to expanded states, in order to check if the same state
 												// has already been expanded
-	ConcurrentMap<Integer, S> expandedStates = new ConcurrentHashMap<>();
+	List<Integer> expandedTopLevelStates;
+	public static final int RECORD_STATES_UP_TO_DEPTH = 4;
 
 	protected Timer timer;
 	public Statistics statistics;
@@ -82,26 +84,30 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		ArrayList<Future<Double>> futureValue;
 		do {
 			currDepthLimit++;
-			futureValue = new ArrayList<>(results.size());
 			if (logEnabled)
 				logText = new StringBuffer("Starting search up to depth " + currDepthLimit + "\n");
 			heuristicEvaluationUsed = false;
 			runningStatistics = new Statistics();
 			runningStatistics.reachedDepth = currDepthLimit;
+			futureValue = new ArrayList<>(results.size());
 			ActionStore<A> newResults = new ActionStore<>();
-			expandedStates.clear();
+			expandedTopLevelStates = new ArrayList<>(results.size());
 			System.gc();
 			//long startTime = System.currentTimeMillis();
-			for (A action : results) {  //initial move generate states all different form each other: add them to the expanded states list
-				S newState = game.getResult(state, action);
-				if (graphOptimization) {
-					expandedStates.put(Integer.valueOf(newState.hashCode()), newState);
+			if (graphOptimization) {
+				for (int i = 0; i<results.size(); i++) {  //initial move generate states all different form each other: add them to the expanded states list
+					A action = results.get(i);
+					S newState = game.getResult(state, action);
+					expandedTopLevelStates.add(Integer.valueOf(newState.hashCode()));
 				}
 			}
 			for (A action : results) {  //launch minMax evaluation on each possible action
 				try {
 					Callable<Double> callable = () -> {
-						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1);
+						Set<Integer> threadExpandedStates = new TreeSet<>();
+						threadExpandedStates.addAll(expandedTopLevelStates);
+						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1, threadExpandedStates);
+						threadExpandedStates.clear();
 						return value;
 					};
 					futureValue.add(executor.submit(callable));
@@ -133,6 +139,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			if (newResults.size() > 0) {
 				results = newResults.actions;
 				utilities = newResults.utilValues;
+				runningStatistics.maxResultUtility = newResults.utilValues.get(0);
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
@@ -165,7 +172,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	}
 
 	// returns an utility value
-	public double maxValue(S state, P player, double alpha, double beta, int depth) {
+	public double maxValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) {
 		runningStatistics.expandedNodes++;
 		// updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
@@ -176,10 +183,10 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
-					if (depth <= 2)
-						jump = expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null;
+					if (depth <= RECORD_STATES_UP_TO_DEPTH)
+						jump = threadExpandedStates.add(Integer.valueOf(newState.hashCode())) == false;
 					else
-						jump = expandedStates.get(Integer.valueOf(newState.hashCode())) != null;
+						jump = threadExpandedStates.contains(Integer.valueOf(newState.hashCode()));
 					if (jump) { // this state has already been expanded by the same player, and so previously
 								// evaluated. Continue with the next move
 						// expandedStates.remove(newState);
@@ -187,7 +194,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 						continue;
 					}
 				}
-				value = Math.max(value, minValue(newState, player, alpha, beta, depth + 1));
+				value = Math.max(value, minValue(newState, player, alpha, beta, depth + 1, threadExpandedStates));
 				if (value >= beta)
 					return value;
 				alpha = Math.max(alpha, value);
@@ -197,7 +204,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	}
 
 	// returns an utility value
-	public double minValue(S state, P player, double alpha, double beta, int depth) {
+	public double minValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) {
 		runningStatistics.expandedNodes++;
 		// updateMetrics(depth);
 		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
@@ -208,10 +215,10 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
-					if (depth <= 2)
-						jump = expandedStates.put(Integer.valueOf(newState.hashCode()), newState) != null;
+					if (depth <= RECORD_STATES_UP_TO_DEPTH)
+						jump = threadExpandedStates.add(Integer.valueOf(newState.hashCode())) == false;
 					else
-						jump = expandedStates.get(Integer.valueOf(newState.hashCode())) != null;
+						jump = threadExpandedStates.contains(Integer.valueOf(newState.hashCode()));
 					if (jump) { // this state has already been expanded by the same player, and so previously
 								// evaluated. Continue with the next move
 						// expandedStates.remove(newState);
@@ -219,7 +226,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 						continue;
 					}
 				}
-				value = Math.min(value, maxValue(newState, player, alpha, beta, depth + 1));
+				value = Math.min(value, maxValue(newState, player, alpha, beta, depth + 1, threadExpandedStates));
 				if (value <= alpha)
 					return value;
 				beta = Math.min(beta, value);
@@ -296,16 +303,21 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		public long expandedNodes;
 		public long reachedDepth;
 		public long skippedSameNodes;
+		public Double maxResultUtility;
 
 		public Statistics() {
 			expandedNodes = 0;
 			reachedDepth = 0;
 			skippedSameNodes = 0;
+			maxResultUtility = Double.MIN_VALUE;
 		}
 
 		public String toString() {
-			return "SEARCH STATISTICS:\n" + "expandedNodes: " + expandedNodes + "\n" + "skippedSameNodes: "
-					+ skippedSameNodes + "\n" + "reachedDepth: " + reachedDepth + "\n";
+			return "SEARCH STATISTICS:\n" + 
+					"HeuristicVal: " + maxResultUtility + "\n" + 
+					"expandedNodes: " + expandedNodes + "\n" + 
+					"skippedSameNodes: " + skippedSameNodes + "\n" + 
+					"reachedDepth: " + reachedDepth + "\n";
 		}
 	}
 }
