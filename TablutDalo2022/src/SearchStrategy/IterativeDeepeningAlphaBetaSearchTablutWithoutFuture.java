@@ -18,6 +18,8 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 		extends IterativeDeepeningAlphaBetaSearchTablut<S, A, P> implements AdversarialSearch<S, A> {
 
 	HashSet<S> expandedStates = new HashSet<>();
+	
+	public static final int RECORD_STATES_UP_TO_DEPTH = 2;
 
 	public IterativeDeepeningAlphaBetaSearchTablutWithoutFuture(Game<S, A, P> game, double utilMin, double utilMax, int time) {
 		super(game, utilMin, utilMax, time);

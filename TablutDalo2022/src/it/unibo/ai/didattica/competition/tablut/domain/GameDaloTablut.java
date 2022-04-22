@@ -97,7 +97,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 		
 		if (DEBUG) { //check if all generated actions are actually legal for the prof's checks
 			for (Action action : result) {
-				if (!checkAction(stato, action)) {
+				if (!staticGameAshtonTablut.checkAction(stato, action, DEBUG)) {
 					System.err.println("Error!! illegal action was generated");
 					System.err.println("State: ");
 					System.err.println(stato.boardStringWithCellIndex());
@@ -137,9 +137,9 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 		// a questo punto controllo lo stato per eventuali catture
 		if (state.getTurn().equalsTurn("W")) {
-			state = this.checkCaptureBlack(state, a);
+			state = staticGameAshtonTablut.checkCaptureBlack(state, a);
 		} else if (state.getTurn().equalsTurn("B")) {
-			state = this.checkCaptureWhite(state, a);
+			state = staticGameAshtonTablut.checkCaptureWhite(state, a);
 		}
 
 		// if something has been captured, clear cache for draws
@@ -657,7 +657,7 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 	}
 	
 	
-	// ------------------------------------------------------------------ ACTION GENERATION AND CHECKING ------------------------------------------------------------------------------
+	// ------------------------------------------------------------------ ACTION GENERATION ------------------------------------------------------------------------------
 	public static List<Action> getPawnActions(int row, int column, Pawn[][] board, Turn turn) throws IOException {
 		List<Action> result = new ArrayList<>();
 		boolean canEnterCitadel = turn.equals(Turn.BLACK) && GameAshtonTablut.citadels.contains(State.getBox(row, column)); //this pawn can enter a citadel (WHITE and BLACK out of citadels cannot enter in citadels)
@@ -692,184 +692,5 @@ public class GameDaloTablut extends GameAshtonTablut implements Game<State, Acti
 
 		return result;
 	}
-	
-	//this is only needed if you want to do some extra checks now
-	public static boolean checkAction(State state, Action a) {
-		//if (DEBUG) System.out.println(a.toString());
-		// controllo la mossa
-		if (a.getTo().length() != 2 || a.getFrom().length() != 2) {
-			if (DEBUG) 
-				System.out.println("Formato mossa errato");
-			return false;
-		}
-		int columnFrom = a.getColumnFrom();
-		int columnTo = a.getColumnTo();
-		int rowFrom = a.getRowFrom();
-		int rowTo = a.getRowTo();
-
-		// controllo se sono fuori dal tabellone
-		if (columnFrom > state.getBoard().length - 1 || rowFrom > state.getBoard().length - 1
-				|| rowTo > state.getBoard().length - 1 || columnTo > state.getBoard().length - 1 || columnFrom < 0
-				|| rowFrom < 0 || rowTo < 0 || columnTo < 0) {
-			if (DEBUG)
-				System.out.println("Mossa fuori tabellone");
-			return false;
-		}
-
-		// controllo che non vada sul trono
-		if (state.getPawn(rowTo, columnTo).equalsPawn(State.Pawn.THRONE.toString())) {
-			if (DEBUG)
-				System.out.println("Mossa sul trono");
-			return false;
-		}
-
-		// controllo la casella di arrivo
-		if (!state.getPawn(rowTo, columnTo).equalsPawn(State.Pawn.EMPTY.toString())) {
-			if (DEBUG)
-				System.out.println("Mossa sopra una casella occupata");
-			return false;
-		}
-		if (GameAshtonTablut.citadels.contains(state.getBox(rowTo, columnTo))
-				&& !GameAshtonTablut.citadels.contains(state.getBox(rowFrom, columnFrom))) {
-			if (DEBUG)
-				System.out.println("Mossa che arriva sopra una citadel");
-			return false;
-		}
-		if (GameAshtonTablut.citadels.contains(state.getBox(rowTo, columnTo))
-				&& GameAshtonTablut.citadels.contains(state.getBox(rowFrom, columnFrom))) {
-			if (rowFrom == rowTo) {
-				if (columnFrom - columnTo > 5 || columnFrom - columnTo < -5) {
-					if (DEBUG)
-						System.out.println("Mossa che arriva sopra una citadel");
-					return false;
-				}
-			} else {
-				if (rowFrom - rowTo > 5 || rowFrom - rowTo < -5) {
-					if (DEBUG)
-						System.out.println("Mossa che arriva sopra una citadel");
-					return false;
-				}
-			}
-		}
-
-		// controllo se cerco di stare fermo
-		if (rowFrom == rowTo && columnFrom == columnTo) {
-			if (DEBUG)
-				System.out.println("Nessuna mossa");
-			return false;
-		}
-
-		// controllo se sto muovendo una pedina giusta
-		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve controllare)
-		if (state.getTurn().equalsTurn(State.Turn.WHITE.toString())) {
-			if (!state.getPawn(rowFrom, columnFrom).equalsPawn("W")
-					&& !state.getPawn(rowFrom, columnFrom).equalsPawn("K")) {
-				if (DEBUG)
-					System.out.println("Giocatore " + a.getTurn() + " cerca di muovere una pedina avversaria");
-				return false;
-			}
-		}
-		if (state.getTurn().equalsTurn(State.Turn.BLACK.toString())) {
-			if (!state.getPawn(rowFrom, columnFrom).equalsPawn("B")) {
-				if (DEBUG)
-					System.out.println("Giocatore " + a.getTurn() + " cerca di muovere una pedina avversaria");
-				return false;
-			}
-		}
-
-		// controllo di non muovere in diagonale
-		// stiamo generando noi le mosse, quindi sono giste (mentre il server deve controllare)
-		if (rowFrom != rowTo && columnFrom != columnTo) {
-			if (DEBUG)
-				System.out.println("Mossa in diagonale");
-			return false;
-		}
-
-		// controllo di non scavalcare pedine (o altro... trono, citadels se sono un bianco, ecc..)
-		if (rowFrom == rowTo) {
-			if (columnFrom > columnTo) {
-				for (int i = columnTo; i < columnFrom; i++) {
-					if (!state.getPawn(rowFrom, i).equalsPawn(State.Pawn.EMPTY.toString())) {
-						if (state.getPawn(rowFrom, i).equalsPawn(State.Pawn.THRONE.toString())) {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca il trono");
-							return false;
-						} else {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca una pedina");
-							return false;
-						}
-					}
-					if (GameAshtonTablut.citadels.contains(state.getBox(rowFrom, i))
-							&& !GameAshtonTablut.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
-						if (DEBUG)
-							System.out.println("Mossa che scavalca una citadel");
-						return false;
-					}
-				}
-			} else {
-				for (int i = columnFrom + 1; i <= columnTo; i++) {
-					if (!state.getPawn(rowFrom, i).equalsPawn(State.Pawn.EMPTY.toString())) {
-						if (state.getPawn(rowFrom, i).equalsPawn(State.Pawn.THRONE.toString())) {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca il trono");
-							return false;
-						} else {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca una pedina");
-							return false;
-						}
-					}
-					if (GameAshtonTablut.citadels.contains(state.getBox(rowFrom, i))
-							&& !GameAshtonTablut.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
-						if (DEBUG)
-							System.out.println("Mossa che scavalca una citadel");
-						return false;
-					}
-				}
-			}
-		} else {
-			if (rowFrom > rowTo) {
-				for (int i = rowTo; i < rowFrom; i++) {
-					if (!state.getPawn(i, columnFrom).equalsPawn(State.Pawn.EMPTY.toString())) {
-						if (state.getPawn(i, columnFrom).equalsPawn(State.Pawn.THRONE.toString())) {
-							// if(DEBUG) System.out.println("Mossa che scavalca il trono");
-							return false;
-						} else {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca una pedina");
-							return false;
-						}
-					}
-					if (GameAshtonTablut.citadels.contains(state.getBox(i, columnFrom))
-							&& !GameAshtonTablut.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
-						if (DEBUG)
-							System.out.println("Mossa che scavalca una citadel");
-						return false;
-					}
-				}
-			} else {
-				for (int i = rowFrom + 1; i <= rowTo; i++) {
-					if (!state.getPawn(i, columnFrom).equalsPawn(State.Pawn.EMPTY.toString())) {
-						if (state.getPawn(i, columnFrom).equalsPawn(State.Pawn.THRONE.toString())) {
-							if (DEBUG)
-								System.out.println("Mossa che scavalca il trono");
-							return false;
-						} else {
-							// if(DEBUG) System.out.println("Mossa che scavalca una pedina");
-							return false;
-						}
-					}
-					if (GameAshtonTablut.citadels.contains(state.getBox(i, columnFrom))
-							&& !GameAshtonTablut.citadels.contains(state.getBox(a.getRowFrom(), a.getColumnFrom()))) {
-						if (DEBUG)
-							System.out.println("Mossa che scavalca una citadel");
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
-	// ---------------------------------------------------------- END   ACTION GENERATION AND CHECKING ------------------------------------------------------------------------------
+	// ---------------------------------------------------------- END   ACTION GENERATION ------------------------------------------------------------------------------
 }

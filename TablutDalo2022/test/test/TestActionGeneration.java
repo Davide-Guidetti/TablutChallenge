@@ -12,6 +12,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.staticGameAshtonTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 
@@ -73,7 +74,7 @@ class TestActionGeneration {
 						List<Action> allActions = getAllPawnActions(row, column, board, turn);
 						allLegalActions.clear();
 						for(Action a : allActions) {
-							if(GameDaloTablut.checkAction(state,a)) {
+							if(staticGameAshtonTablut.checkAction(state,a, false)) {
 								allLegalActions.add(a);
 							}
 						}

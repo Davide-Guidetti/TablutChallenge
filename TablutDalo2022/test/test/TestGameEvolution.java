@@ -20,8 +20,8 @@ class TestGameEvolution {
 
 	@Test
 	void test_no_cuncurrent() {
-		int timeout = 10;
-		int maxDepth = 6;
+		int timeout = 10000;
+		int maxDepth = 4;
 
 		GameDaloTablut rulesBlack;
 		IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<State, Action, String> searchStrategyBlack;
@@ -32,8 +32,8 @@ class TestGameEvolution {
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
 		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesBlack, 0.0,
 				GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
-		searchStrategyBlack.logEnabled = true;
-		searchStrategyBlack.printStatistics = true;
+		searchStrategyBlack.logEnabled = false;
+		searchStrategyBlack.printStatistics = false;
 		searchStrategyBlack.graphOptimization = false;
 		searchStrategyBlack.maxDepth = maxDepth;
 
@@ -54,14 +54,14 @@ class TestGameEvolution {
 		rulesBlack = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.BLACK);
 		searchStrategyBlack = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesBlack, 0.0,
 				GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
-		searchStrategyBlack.printStatistics = true;
+		searchStrategyBlack.printStatistics = false;
 		searchStrategyBlack.graphOptimization = true;
 		searchStrategyBlack.maxDepth = maxDepth;
 
 		rulesWhite = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black", State.Turn.WHITE);
 		searchStrategyWhite = new IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<>(rulesWhite, 0.0,
 				GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
-		searchStrategyWhite.printStatistics = true;
+		searchStrategyWhite.printStatistics = false;
 		searchStrategyWhite.graphOptimization = true;
 		searchStrategyWhite.maxDepth = maxDepth;
 
@@ -206,12 +206,13 @@ class TestGameEvolution {
 			IterativeDeepeningAlphaBetaSearchTablut<State, Action, String> searchBlack) {
 		List<Action> actions = new ArrayList<>();
 		State currentState = new StateTablut();
+		currentState.setTurn(Turn.WHITE);
 		Action chosenMove = null;
 		while (true) {
 			// WHITE TURN
 			chosenMove = searchWhite.makeDecision(currentState);
 			if (searchWhite.statistics.skippedSameNodes > 0)
-				System.out.println("skippedSameNodes! \n" + searchWhite.statistics);
+				System.out.println("skippedSameNodes! \n"/* + searchWhite.statistics*/);
 			if (searchWhite.timedOut)
 				System.out.println("Timed out search");
 			if (searchWhite.outOfMemoryOccurred)
@@ -223,7 +224,7 @@ class TestGameEvolution {
 			// BLACK TURN
 			chosenMove = searchBlack.makeDecision(currentState);
 			if (searchBlack.statistics.skippedSameNodes > 0)
-				System.out.println("skippedSameNodes! \n" + searchWhite.statistics);
+				System.out.println("skippedSameNodes! \n"/* + searchWhite.statistics*/);
 			if (searchBlack.timedOut)
 				System.out.println("Timed out search");
 			if (searchBlack.outOfMemoryOccurred)
