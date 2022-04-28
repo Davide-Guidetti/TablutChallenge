@@ -3,6 +3,9 @@ package it.unibo.ai.didattica.competition.tablut.client;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut;
 import aima.core.search.adversarial.Game;
@@ -10,6 +13,7 @@ import it.unibo.ai.didattica.competition.tablut.domain.Action;
 import it.unibo.ai.didattica.competition.tablut.domain.GameDaloTablut;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.StateTablut;
+import it.unibo.ai.didattica.competition.tablut.domain.State.Turn;
 
 public class TablutDalo extends TablutClient {
 	public static final String NAME = "Cliente";
@@ -24,7 +28,7 @@ public class TablutDalo extends TablutClient {
 		rules = new GameDaloTablut(new StateTablut(), 2, 2, "log", "White", "Black",this.getPlayer());
 		searchStrategy = new IterativeDeepeningAlphaBetaSearchTablut<>(rules, 0.0, GameDaloTablut.getMaxValueHeuristic(), timeout - 1);
 		searchStrategy.printStatistics=true;
-		searchStrategy.graphOptimization=true;
+		searchStrategy.graphOptimization=false;
 	}
 
 	public static void main(String[] args) {
@@ -120,8 +124,15 @@ public class TablutDalo extends TablutClient {
 			else if (this.getPlayer().equals(this.getCurrentState().getTurn())) {
 				Action chosenMove = null;
 				System.out.println("I am thinking...");
-				chosenMove = this.searchStrategy.makeDecision(state);
-				System.out.println("Chosen move: " + chosenMove);
+				try {
+					chosenMove = this.searchStrategy.makeDecision(state);
+					System.out.println("Chosen move: " + chosenMove);
+					((GameDaloTablut)rules).checkMove(state, chosenMove);
+				} catch (Exception e) {
+					System.err.println("Something went wrong, or an illegal action has been chosen: " + e.getMessage());
+					chosenMove = emergencyMove(state);
+					System.out.println("New chosen emergecy move:" + chosenMove);
+				}
 				try {
 					this.write(chosenMove);
 				} catch (IOException | ClassNotFoundException e) {
@@ -135,5 +146,86 @@ public class TablutDalo extends TablutClient {
 			}
 		}
 
+	}
+
+	/*
+	 * Generate a random valid move
+	 * This method loops unitl a valid move is found (which may actually never happen), so use this in case of emergency
+	 */
+	private Action emergencyMove(State state) {
+		// Mio turno
+		int[] buf;
+		List<int[]> pawns = new ArrayList<>();
+		List<int[]> empty = new ArrayList<>();
+		if (this.getCurrentState().getTurn().equals(StateTablut.Turn.WHITE)) {
+			for (int i = 0; i < state.getBoard().length; i++) {
+				for (int j = 0; j < state.getBoard().length; j++) {
+					if (state.getPawn(i, j).equalsPawn(State.Pawn.WHITE.toString())
+							|| state.getPawn(i, j).equalsPawn(State.Pawn.KING.toString())) {
+						buf = new int[2];
+						buf[0] = i;
+						buf[1] = j;
+						pawns.add(buf);
+					} else if (state.getPawn(i, j).equalsPawn(State.Pawn.EMPTY.toString())) {
+						buf = new int[2];
+						buf[0] = i;
+						buf[1] = j;
+						empty.add(buf);
+					}
+				}
+			}
+		}else {
+			for (int i = 0; i < state.getBoard().length; i++) {
+				for (int j = 0; j < state.getBoard().length; j++) {
+					if (state.getPawn(i, j).equalsPawn(State.Pawn.BLACK.toString())) {
+						buf = new int[2];
+						buf[0] = i;
+						buf[1] = j;
+						pawns.add(buf);
+					} else if (state.getPawn(i, j).equalsPawn(State.Pawn.EMPTY.toString())) {
+						buf = new int[2];
+						buf[0] = i;
+						buf[1] = j;
+						empty.add(buf);
+					}
+				}
+			}
+		}
+
+		int[] selected = null;
+
+		boolean found = false;
+		Action a = null;
+		try {
+			a = new Action("z0", "z0", this.getCurrentState().getTurn());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		while (!found) {
+			if (pawns.size() > 1) {
+				selected = pawns.get(new Random().nextInt(pawns.size() - 1));
+			} else {
+				selected = pawns.get(0);
+			}
+
+			String from = this.getCurrentState().getBox(selected[0], selected[1]);
+
+			selected = empty.get(new Random().nextInt(empty.size() - 1));
+			String to = this.getCurrentState().getBox(selected[0], selected[1]);
+
+			try {
+				a = new Action(from, to, this.getCurrentState().getTurn());
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			try {
+				((GameDaloTablut)rules).checkMove(state, a);
+				found = true;
+			} catch (Exception e) {}
+		}
+		
+		return a;
 	}
 }

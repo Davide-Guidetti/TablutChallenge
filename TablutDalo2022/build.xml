@@ -72,7 +72,10 @@
 	</target>
 
 	<target name="daloWhite">
-		<java classname="it.unibo.ai.didattica.competition.tablut.client.TablutDaloWhite" fork="true">
+		<java classname="it.unibo.ai.didattica.competition.tablut.client.TablutDalo" fork="true">
+			<arg value="WHITE"/>
+			<arg value="60"/>
+			<arg value="localhost"/>
 			<classpath>
 				<pathelement location="lib/gson-2.2.2.jar" />
 				<pathelement location="build" />
@@ -81,7 +84,10 @@
 	</target>
 	
 	<target name="daloBlack">
-			<java classname="it.unibo.ai.didattica.competition.tablut.client.TablutDaloBlack" fork="true">
+			<java classname="it.unibo.ai.didattica.competition.tablut.client.TablutDalo" fork="true">
+				<arg value="BLACK"/>
+				<arg value="60"/>
+				<arg value="localhost"/>
 				<classpath>
 					<pathelement location="lib/gson-2.2.2.jar" />
 					<pathelement location="build" />
