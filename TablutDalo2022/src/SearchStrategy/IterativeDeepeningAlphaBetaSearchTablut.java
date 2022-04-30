@@ -91,7 +91,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			runningStatistics.reachedDepth = currDepthLimit;
 			futureValue = new ArrayList<>(results.size());
 			ActionStore<A> newResults = new ActionStore<>();
-			expandedTopLevelStates = new ArrayList<>(results.size());
+			if (graphOptimization) expandedTopLevelStates = new ArrayList<>(results.size());
 			System.gc();
 			//long startTime = System.currentTimeMillis();
 			if (graphOptimization) {
@@ -104,10 +104,18 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			for (A action : results) {  //launch minMax evaluation on each possible action
 				try {
 					Callable<Double> callable = () -> {
-						Set<Integer> threadExpandedStates = new TreeSet<>();
-						threadExpandedStates.addAll(expandedTopLevelStates);
-						double value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1, threadExpandedStates);
-						threadExpandedStates.clear();
+						double value;
+						try {
+							Set<Integer> threadExpandedStates = null;
+							if (graphOptimization) {
+								threadExpandedStates = new TreeSet<>();
+								threadExpandedStates.addAll(expandedTopLevelStates);
+							}
+							value = minValue(game.getResult(state, action), player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1, threadExpandedStates);
+							if (graphOptimization) threadExpandedStates.clear();
+						}catch(TimerException e){
+							value = 0.0;
+						}
 						return value;
 					};
 					futureValue.add(executor.submit(callable));
@@ -125,6 +133,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 					e.printStackTrace();
 				}
 				if (timer.timeOutOccurred()) { //the expansion up to this depth is not complete, so we skip getting the results
+					newResults = new ActionStore<>(); //these action values are not valid: cancel them
 					break;
 				}
 			}
@@ -140,6 +149,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 				results = newResults.actions;
 				utilities = newResults.utilValues;
 				runningStatistics.maxResultUtility = newResults.utilValues.get(0);
+				statistics = runningStatistics;
+				if (printStatistics)
+					System.out.println(statistics);
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
@@ -150,9 +162,6 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 			}
 			if (logEnabled)
 				System.out.println(logText);
-			statistics = runningStatistics;
-			if (printStatistics)
-				System.out.println(statistics);
 		} while ( // exit if:
 				!timer.timeOutOccurred() && // time elapse OR
 				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
@@ -172,14 +181,16 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	}
 
 	// returns an utility value
-	public double maxValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) {
+	public double maxValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) throws TimerException {
 		runningStatistics.expandedNodes++;
 		// updateMetrics(depth);
-		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
+		if (timer.timeOutOccurred()) throw new TimerException();
+		if (game.isTerminal(state) || depth >= currDepthLimit ) {
 			return eval(state, player);
 		} else {
 			double value = Double.NEGATIVE_INFINITY;
 			for (A action : game.getActions(state)) {
+				if (timer.timeOutOccurred()) throw new TimerException();
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
@@ -204,14 +215,16 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 	}
 
 	// returns an utility value
-	public double minValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) {
+	public double minValue(S state, P player, double alpha, double beta, int depth, Set<Integer> threadExpandedStates) throws TimerException {
 		runningStatistics.expandedNodes++;
 		// updateMetrics(depth);
-		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
+		if (timer.timeOutOccurred()) throw new TimerException();
+		if (game.isTerminal(state) || depth >= currDepthLimit) {
 			return eval(state, player);
 		} else {
 			double value = Double.POSITIVE_INFINITY;
 			for (A action : game.getActions(state)) {
+				if (timer.timeOutOccurred()) throw new TimerException();
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
@@ -269,15 +282,14 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		Timer(int maxSeconds) {
 			this.duration = 1000 * maxSeconds;
 		}
-
 		void start() {
 			startTime = System.currentTimeMillis();
 		}
-
 		boolean timeOutOccurred() {
 			return System.currentTimeMillis() > startTime + duration;
 		}
 	}
+	public static class TimerException extends Exception {}
 
 	/**
 	 * Orders actions by utility.
@@ -304,6 +316,7 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		public long reachedDepth;
 		public long skippedSameNodes;
 		public Double maxResultUtility;
+		public boolean graphOptimization;
 
 		public Statistics() {
 			expandedNodes = 0;

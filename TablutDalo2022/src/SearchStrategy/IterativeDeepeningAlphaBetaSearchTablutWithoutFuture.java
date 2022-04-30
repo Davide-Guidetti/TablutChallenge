@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut.ActionStore;
+import SearchStrategy.IterativeDeepeningAlphaBetaSearchTablut.TimerException;
 import aima.core.search.adversarial.AdversarialSearch;
 import aima.core.search.adversarial.Game;
 import aima.core.search.adversarial.IterativeDeepeningAlphaBetaSearch;
@@ -58,12 +60,15 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 							continue;
 						}
 					}
-					double value = minValue(
-							(logEnabled) ? logExpansion(newState, action, player, logText)
-									: game.getResult(state, action),
+					double value = 0;
+					try {
+						value = minValue(
+							(logEnabled) ? logExpansion(newState, action, player, logText) : game.getResult(state, action),
 							player, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1);
-					if (timer.timeOutOccurred())
+					}catch(TimerException e) {
+						newResults = new ActionStore<>(); //these action values are not valid: cancel them
 						break; // exit from action loop
+					}
 					newResults.add(action, value);
 					if (logEnabled)
 						logText.append("value for top level action " + action + " = " + value + " \n");
@@ -78,22 +83,19 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 				results = newResults.actions;
 				utilities = newResults.utilValues;
 				runningStatistics.maxResultUtility = newResults.utilValues.get(0);
+				statistics = runningStatistics;
+				if (printStatistics)
+					System.out.println(statistics);
 				if (logEnabled)
 					logText.append(
 							"Action chosen: \"" + results.get(0) + "\", utility = " + newResults.utilValues.get(0)
 									+ " (max possible value: " + GameDaloTablut.getMaxValueHeuristic() + ")\n");
 			} else {
-				// TODO
-				// maybe choose a random correct action by generatig all of them and returning
-				// the first feasible one by checking it with prof's checkmove
 				if (logEnabled)
 					logText.append("No action to chose from");
 			}
 			if (logEnabled)
 				System.out.println(logText);
-			statistics = runningStatistics;
-			if (printStatistics)
-				System.out.println(statistics);
 		} while ( // exit if:
 				!timer.timeOutOccurred() && // time elapse OR
 				heuristicEvaluationUsed && // heuristic not used = all evaluated states was terminal, or maximun depth has been reacked OR
@@ -106,14 +108,16 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 	}
 
 	// returns an utility value
-	public double maxValue(S state, P player, double alpha, double beta, int depth) {
+	public double maxValue(S state, P player, double alpha, double beta, int depth) throws TimerException {
 		runningStatistics.expandedNodes++;
 		updateMetrics(depth);
-		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
+		if (timer.timeOutOccurred()) throw new TimerException();
+		if (game.isTerminal(state) || depth >= currDepthLimit) {
 			return eval(state, player);
 		} else {
 			double value = Double.NEGATIVE_INFINITY;
 			for (A action : game.getActions(state)) {
+				if (timer.timeOutOccurred()) throw new TimerException();
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
@@ -138,14 +142,16 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 	}
 
 	// returns an utility value
-	public double minValue(S state, P player, double alpha, double beta, int depth) {
+	public double minValue(S state, P player, double alpha, double beta, int depth) throws TimerException {
 		runningStatistics.expandedNodes++;
 		updateMetrics(depth);
-		if (game.isTerminal(state) || depth >= currDepthLimit || timer.timeOutOccurred()) {
+		if (timer.timeOutOccurred()) throw new TimerException();
+		if (game.isTerminal(state) || depth >= currDepthLimit) {
 			return eval(state, player);
 		} else {
 			double value = Double.POSITIVE_INFINITY;
 			for (A action : game.getActions(state)) {
+				if (timer.timeOutOccurred()) throw new TimerException();
 				S newState = game.getResult(state, action);
 				if (graphOptimization) {
 					boolean jump = false;
