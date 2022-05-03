@@ -79,7 +79,8 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		timer.start();
 		timedOut = false;
 		outOfMemoryOccurred = false;
-		currDepthLimit = 0;
+		if(timer.getDuration()>50 && maxDepth==Integer.MAX_VALUE)currDepthLimit = 3; //skip the fisrt iterations
+		else currDepthLimit = 0;
 		metrics = new Metrics();
 		ArrayList<Future<Double>> futureValue;
 		do {
@@ -284,6 +285,9 @@ public class IterativeDeepeningAlphaBetaSearchTablut<S, A, P>
 		}
 		void start() {
 			startTime = System.currentTimeMillis();
+		}
+		long getDuration() {
+			return this.duration/1000;
 		}
 		boolean timeOutOccurred() {
 			return System.currentTimeMillis() > startTime + duration;

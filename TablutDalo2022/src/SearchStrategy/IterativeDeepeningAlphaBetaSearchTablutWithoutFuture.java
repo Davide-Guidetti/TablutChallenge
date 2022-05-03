@@ -35,7 +35,8 @@ public class IterativeDeepeningAlphaBetaSearchTablutWithoutFuture<S, A, P>
 		timer.start();
 		timedOut = false;
 		outOfMemoryOccurred = false;
-		currDepthLimit = 0;
+		if(timer.getDuration()>50 && maxDepth==Integer.MAX_VALUE)currDepthLimit = 3; //skip the fisrt iterations
+		else currDepthLimit = 0;
 		metrics = new Metrics();
 		do {
 			currDepthLimit++;
